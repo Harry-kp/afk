@@ -33,6 +33,7 @@ const copy = COPIES[Math.floor(Math.random() * COPIES.length)];
 function Break({ isLongBreak }: { isLongBreak: boolean }) {
   const [seconds, setSeconds] = useState<number | null>(null);
   const [isClosing, setIsClosing] = useState(false);
+  const [shouldClose, setShouldClose] = useState(false);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
   // Initialize break duration from store (must fetch from backend, not cache)
@@ -74,15 +75,21 @@ function Break({ isLongBreak }: { isLongBreak: boolean }) {
     };
   }, [seconds !== null]); // Only start when initialized
 
-  // Handle break end
+  // Handle break end - trigger closing animation
   useEffect(() => {
     if (seconds === 0 && !isClosing) {
       setIsClosing(true);
       // End break and start new session
       window.electron.session.endBreak();
-      getCurrentWindow().close().catch(console.error);
     }
   }, [seconds, isClosing]);
+
+  // Actually close window after animation completes
+  useEffect(() => {
+    if (shouldClose) {
+      getCurrentWindow().close().catch(console.error);
+    }
+  }, [shouldClose]);
 
   // Confetti effect for long breaks
   useEffect(() => {
@@ -119,7 +126,7 @@ function Break({ isLongBreak }: { isLongBreak: boolean }) {
     
     track('break_skipped');
     await window.electron.session.skipBreak();
-    getCurrentWindow().close().catch(console.error);
+    // Window will close after animation completes
   };
 
   const handleSnooze = async () => {
@@ -128,7 +135,7 @@ function Break({ isLongBreak }: { isLongBreak: boolean }) {
     
     track('break_snoozed');
     await window.electron.session.snooze();
-    getCurrentWindow().close().catch(console.error);
+    // Window will close after animation completes
   };
 
   // Show loading state while initializing
@@ -147,12 +154,20 @@ function Break({ isLongBreak }: { isLongBreak: boolean }) {
   return (
     <AuroraBackground>
       <motion.div
-        initial={{ opacity: 0.0, y: 40 }}
-        whileInView={{ opacity: 1, y: 0 }}
+        initial={{ opacity: 0, y: 40, scale: 1 }}
+        animate={isClosing 
+          ? { opacity: 0, scale: 0.95, y: 0 } 
+          : { opacity: 1, y: 0, scale: 1 }
+        }
         transition={{
-          delay: 0.3,
-          duration: 0.8,
+          duration: isClosing ? 0.4 : 0.8,
+          delay: isClosing ? 0 : 0.3,
           ease: 'easeInOut',
+        }}
+        onAnimationComplete={() => {
+          if (isClosing) {
+            setShouldClose(true);
+          }
         }}
         className="relative flex flex-col gap-4 items-center justify-center px-4"
       >
