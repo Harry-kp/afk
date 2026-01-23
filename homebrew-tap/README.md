@@ -1,6 +1,6 @@
-# Homebrew Tap for Afk
+# Homebrew Tap for AFK
 
-This is the official Homebrew tap for [Afk](https://afk-app.vercel.app) - a break reminder app for developers.
+This is the official Homebrew tap for [AFK](https://afk-app.vercel.app) - a break reminder app for developers.
 
 ## Installation
 
@@ -32,6 +32,6 @@ brew uninstall --cask afk
 
 ## About
 
-Afk helps you take regular breaks while coding to reduce eye strain and stay focused. Lives in your menu bar and gently reminds you when it's time to step away.
+AFK helps you take regular breaks while coding to reduce eye strain and stay focused. Lives in your menu bar and gently reminds you when it's time to step away.
 
 [Learn more](https://afk-app.vercel.app)

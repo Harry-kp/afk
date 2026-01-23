@@ -104,7 +104,7 @@ function Settings({
             <TabsContent value="about">
               <div className="pt-8 text-center">
                 {/* App Logo & Name */}
-                <h1 className="text-3xl font-bold text-white mb-2">Afk</h1>
+                <h1 className="text-3xl font-bold text-white mb-2">AFK</h1>
                 <p className="text-neutral-400 mb-1">Version {APP_VERSION}</p>
                 <p className="text-neutral-500 text-sm mb-8">Step away from your keyboard</p>
                 
@@ -117,7 +117,7 @@ function Settings({
 
                 {/* Share Section */}
                 <div className="mb-8">
-                  <p className="text-neutral-400 text-sm mb-4">Love Afk? Share it with friends!</p>
+                  <p className="text-neutral-400 text-sm mb-4">Love AFK? Share it with friends!</p>
                   <div className="flex justify-center gap-4">
                     <Button
                       variant="outline"
@@ -125,7 +125,7 @@ function Settings({
                       onClick={() => {
                         track('share_twitter');
                         window.open(
-                          `https://twitter.com/intent/tweet?text=${encodeURIComponent('👀 Taking better care of my eyes with Afk - a beautiful break reminder app for developers. Check it out!')}&url=${encodeURIComponent(LANDING_URL)}`,
+                          `https://twitter.com/intent/tweet?text=${encodeURIComponent('👀 Taking better care of my eyes with AFK - a beautiful break reminder app for developers. Check it out!')}&url=${encodeURIComponent(LANDING_URL)}`,
                           '_blank'
                         );
                       }}
