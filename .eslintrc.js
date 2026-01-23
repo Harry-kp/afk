@@ -1,35 +1,43 @@
 module.exports = {
-  extends: 'erb',
-  plugins: ['@typescript-eslint'],
-  rules: {
-    // A temporary hack related to IDE not resolving correct package.json
-    'import/no-extraneous-dependencies': 'off',
-    'react/react-in-jsx-scope': 'off',
-    'react/jsx-filename-extension': 'off',
-    'import/extensions': 'off',
-    'import/no-unresolved': 'off',
-    'import/no-import-module-exports': 'off',
-    'no-shadow': 'off',
-    '@typescript-eslint/no-shadow': 'error',
-    'no-unused-vars': 'off',
-    '@typescript-eslint/no-unused-vars': 'error',
-    'react/jsx-props-no-spreading': 'off',
+  root: true,
+  env: {
+    browser: true,
+    es2022: true,
+    node: true,
   },
+  extends: [
+    'eslint:recommended',
+    'plugin:@typescript-eslint/recommended',
+    'plugin:react/recommended',
+    'plugin:react-hooks/recommended',
+  ],
+  parser: '@typescript-eslint/parser',
   parserOptions: {
     ecmaVersion: 2022,
     sourceType: 'module',
+    ecmaFeatures: {
+      jsx: true,
+    },
+  },
+  plugins: ['@typescript-eslint', 'react', 'react-hooks'],
+  rules: {
+    'react/react-in-jsx-scope': 'off',
+    'react/jsx-filename-extension': ['warn', { extensions: ['.tsx'] }],
+    'react/jsx-props-no-spreading': 'off',
+    '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
+    '@typescript-eslint/no-explicit-any': 'warn',
+    'no-console': ['warn', { allow: ['warn', 'error', 'debug'] }],
   },
   settings: {
-    'import/resolver': {
-      // See https://github.com/benmosher/eslint-plugin-import/issues/1396#issuecomment-575727774 for line below
-      node: {},
-      webpack: {
-        config: require.resolve('./.erb/configs/webpack.config.eslint.ts'),
-      },
-      typescript: {},
-    },
-    'import/parsers': {
-      '@typescript-eslint/parser': ['.ts', '.tsx'],
+    react: {
+      version: 'detect',
     },
   },
+  ignorePatterns: [
+    'node_modules/',
+    'dist/',
+    'src-tauri/target/',
+    '*.config.js',
+    '*.config.ts',
+  ],
 };
