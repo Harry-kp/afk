@@ -30,10 +30,13 @@ function getTime(durationInSeconds: number) {
 
 const copy = COPIES[Math.floor(Math.random() * COPIES.length)];
 
+// Start fading out when this many seconds are left
+const FADE_START_SECONDS = 3;
+
 function Break({ isLongBreak }: { isLongBreak: boolean }) {
   const [seconds, setSeconds] = useState<number | null>(null);
   const [isClosing, setIsClosing] = useState(false);
-  const [shouldClose, setShouldClose] = useState(false);
+  const [isFading, setIsFading] = useState(false);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
   // Initialize break duration from store (must fetch from backend, not cache)
@@ -75,21 +78,25 @@ function Break({ isLongBreak }: { isLongBreak: boolean }) {
     };
   }, [seconds !== null]); // Only start when initialized
 
-  // Handle break end - trigger closing animation
+  // Start fading when approaching end
+  useEffect(() => {
+    if (seconds !== null && seconds <= FADE_START_SECONDS && seconds > 0 && !isFading) {
+      setIsFading(true);
+    }
+  }, [seconds, isFading]);
+
+  // Handle break end - actually close
   useEffect(() => {
     if (seconds === 0 && !isClosing) {
       setIsClosing(true);
       // End break and start new session
       window.electron.session.endBreak();
+      // Small delay to ensure fade completes smoothly
+      setTimeout(() => {
+        getCurrentWindow().close().catch(console.error);
+      }, 200);
     }
   }, [seconds, isClosing]);
-
-  // Actually close window after animation completes
-  useEffect(() => {
-    if (shouldClose) {
-      getCurrentWindow().close().catch(console.error);
-    }
-  }, [shouldClose]);
 
   // Confetti effect for long breaks
   useEffect(() => {
@@ -123,19 +130,27 @@ function Break({ isLongBreak }: { isLongBreak: boolean }) {
   const handleSkipBreak = async () => {
     if (isClosing) return;
     setIsClosing(true);
+    setIsFading(true);
     
     track('break_skipped');
     await window.electron.session.skipBreak();
-    // Window will close after animation completes
+    // Close after fade animation
+    setTimeout(() => {
+      getCurrentWindow().close().catch(console.error);
+    }, 500);
   };
 
   const handleSnooze = async () => {
     if (isClosing) return;
     setIsClosing(true);
+    setIsFading(true);
     
     track('break_snoozed');
     await window.electron.session.snooze();
-    // Window will close after animation completes
+    // Close after fade animation
+    setTimeout(() => {
+      getCurrentWindow().close().catch(console.error);
+    }, 500);
   };
 
   // Show loading state while initializing
@@ -151,23 +166,31 @@ function Break({ isLongBreak }: { isLongBreak: boolean }) {
 
   const { mins, secs } = getTime(seconds);
 
+  // Calculate opacity based on fading state
+  // When isFading, animate to 0 over FADE_START_SECONDS
+  const getAnimateState = () => {
+    if (isClosing) {
+      // User skipped/snoozed - quick fade out
+      return { opacity: 0, scale: 0.95, y: 0 };
+    }
+    if (isFading) {
+      // Last few seconds - gradual fade out
+      return { opacity: 0, scale: 0.98, y: -10 };
+    }
+    // Normal state
+    return { opacity: 1, y: 0, scale: 1 };
+  };
+
   return (
     <AuroraBackground>
       <motion.div
         initial={{ opacity: 0, y: 40, scale: 1 }}
-        animate={isClosing 
-          ? { opacity: 0, scale: 0.95, y: 0 } 
-          : { opacity: 1, y: 0, scale: 1 }
-        }
+        animate={getAnimateState()}
         transition={{
-          duration: isClosing ? 0.4 : 0.8,
-          delay: isClosing ? 0 : 0.3,
-          ease: 'easeInOut',
-        }}
-        onAnimationComplete={() => {
-          if (isClosing) {
-            setShouldClose(true);
-          }
+          // Fading takes the full FADE_START_SECONDS, closing is quicker
+          duration: isClosing ? 0.5 : isFading ? FADE_START_SECONDS : 0.8,
+          delay: (isClosing || isFading) ? 0 : 0.3,
+          ease: 'easeOut',
         }}
         className="relative flex flex-col gap-4 items-center justify-center px-4"
       >
