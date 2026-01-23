@@ -7,10 +7,16 @@ import {
   ArrowLeft,
   TimerReset,
   Volume2,
+  Heart,
+  Twitter,
+  Globe,
+  Share2,
+  ExternalLink,
 } from 'lucide-react';
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './components/ui/tabs';
 import { Separator } from './components/ui/separator';
+import { Button } from './components/ui/button';
 import { StartupSettings } from './startupSettings';
 import { FocusSettings } from './focusSettings';
 import { IdleTimeSettings } from './idleTimeSettings';
@@ -97,39 +103,93 @@ function Settings({
             </TabsContent>
             <TabsContent value="about">
               <div className="pt-8 text-center">
-                <p className="text-4xl mb-2">👀</p>
-                <h1 className="text-xl font-semibold text-white">Afk</h1>
-                <p className="text-neutral-500 text-sm mt-1">v{APP_VERSION}</p>
+                {/* App Logo & Name */}
+                <div className="text-6xl mb-4">👀</div>
+                <h1 className="text-3xl font-bold text-white mb-2">Afk</h1>
+                <p className="text-neutral-400 mb-1">Version {APP_VERSION}</p>
+                <p className="text-neutral-500 text-sm mb-8">Step away from your keyboard</p>
                 
-                <div className="mt-8 flex justify-center gap-6 text-sm">
-                  <a
-                    href={TWITTER_URL}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-neutral-400 hover:text-white transition-colors"
-                  >
-                    Twitter
-                  </a>
+                {/* Tagline */}
+                <div className="bg-neutral-800/50 rounded-lg p-6 mb-8 max-w-md mx-auto">
+                  <p className="text-neutral-300 italic">
+                    &ldquo;Your eyes deserve a break. So do you.&rdquo;
+                  </p>
+                </div>
+
+                {/* Share Section */}
+                <div className="mb-8">
+                  <p className="text-neutral-400 text-sm mb-4">Love Afk? Share it with friends!</p>
+                  <div className="flex justify-center gap-4">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        track('share_twitter');
+                        window.open(
+                          `https://twitter.com/intent/tweet?text=${encodeURIComponent('👀 Taking better care of my eyes with Afk - a beautiful break reminder app for developers. Check it out!')}&url=${encodeURIComponent(LANDING_URL)}`,
+                          '_blank'
+                        );
+                      }}
+                    >
+                      <Twitter className="w-4 h-4 mr-2" />
+                      Tweet
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        track('share_copy_link');
+                        navigator.clipboard.writeText(LANDING_URL);
+                      }}
+                    >
+                      <Share2 className="w-4 h-4 mr-2" />
+                      Copy Link
+                    </Button>
+                  </div>
+                </div>
+
+                <Separator className="my-6 max-w-md mx-auto" />
+
+                {/* Links */}
+                <div className="flex justify-center gap-6 mb-8">
                   <a
                     href={LANDING_URL}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-neutral-400 hover:text-white transition-colors"
+                    className="text-neutral-400 hover:text-white transition-colors flex items-center gap-2"
+                    onClick={() => track('link_website')}
                   >
+                    <Globe className="w-4 h-4" />
                     Website
+                    <ExternalLink className="w-3 h-3" />
+                  </a>
+                  <a
+                    href={TWITTER_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-neutral-400 hover:text-white transition-colors flex items-center gap-2"
+                    onClick={() => track('link_twitter')}
+                  >
+                    <Twitter className="w-4 h-4" />
+                    @Harry_kp_
+                    <ExternalLink className="w-3 h-3" />
                   </a>
                 </div>
 
-                <p className="text-neutral-600 text-xs mt-8">
-                  by{' '}
+                {/* Made with love */}
+                <div className="text-neutral-500 text-sm flex items-center justify-center gap-1">
+                  Made with <Heart className="w-4 h-4 text-red-500 fill-red-500" /> by
                   <a
                     href={GITHUB_URL}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-neutral-500 hover:text-white transition-colors"
+                    className="text-neutral-400 hover:text-white transition-colors"
                   >
                     Harry-kp
                   </a>
+                </div>
+                <p className="text-neutral-600 text-xs mt-2">
+                  © 2024-2026 All rights reserved
                 </p>
               </div>
             </TabsContent>
