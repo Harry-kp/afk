@@ -1,9 +1,9 @@
+# .github/workflows/release.yml
 name: Release
 
 on:
   push:
-    tags:
-      - 'v*'
+    tags: ['v*']
   workflow_dispatch:
     inputs:
       version:
@@ -39,7 +39,7 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Build and release
+      - name: Build Tauri app
         uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -57,10 +57,37 @@ jobs:
 
             ### Direct Download
             Download the DMG below for your architecture.
-            
+
             **First launch:** Right-click the app → Open → Open
             (Required for apps outside the App Store)
           releaseDraft: true
           prerelease: false
           args: --target universal-apple-darwin
 
+      - name: Get version from tag
+        id: get_version
+        run: |
+          VERSION=${GITHUB_REF#refs/tags/v}
+          echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Upload to public releases repo
+        env:
+          GH_TOKEN: ${{ secrets.RELEASES_REPO_TOKEN }}
+        run: |
+          VERSION=${{ steps.get_version.outputs.VERSION }}
+          DMG_PATH="src-tauri/target/universal-apple-darwin/release/bundle/dmg/Afk_${VERSION}_universal.dmg"
+          
+          # Create release in public repo
+          gh release create "v${VERSION}" \
+            --repo Harry-kp/afk-releases \
+            --title "Afk v${VERSION}" \
+            --notes "Release v${VERSION} - Download for macOS" \
+            "$DMG_PATH"
+          
+          echo "✅ Uploaded to afk-releases repo"
+
+      - name: Trigger Homebrew cask update
+        env:
+          GH_TOKEN: ${{ secrets.HOMEBREW_TAP_TOKEN }}
+        run: |
+          gh workflow run update-homebrew.yml --repo Harry-kp/homebrew-tap

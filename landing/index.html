@@ -178,7 +178,7 @@
         <div class="footer-links">
           <a href="https://twitter.com/Harry_kp_" target="_blank">Follow for updates</a>
           <a href="mailto:chaudharyharshit9@gmail.com">Feedback? Email me</a>
-          <a href="https://github.com/Harry-kp/afk/releases/latest" target="_blank" class="version" id="version">v1.0.0</a>
+          <a href="https://github.com/Harry-kp/afk-releases/releases/latest" target="_blank" class="version" id="version">v1.0.0</a>
         </div>
       </div>
     </footer>
@@ -196,8 +196,8 @@
       });
     }
 
-    // Fetch latest version from GitHub
-    fetch('https://api.github.com/repos/Harry-kp/afk/releases/latest')
+    // Fetch latest version from public releases repo
+    fetch('https://api.github.com/repos/Harry-kp/afk-releases/releases/latest')
       .then(res => res.json())
       .then(data => {
         if (data.tag_name) {

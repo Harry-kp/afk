@@ -1,14 +1,14 @@
 cask "afk" do
   version "1.0.0"
-  sha256 :no_check  # Update with actual SHA after first release
+  sha256 :no_check  # Auto-updated by workflow
 
-  url "https://github.com/Harry-kp/afk/releases/download/v#{version}/Afk_#{version}_universal.dmg"
+  url "https://github.com/Harry-kp/afk-releases/releases/download/v#{version}/Afk_#{version}_universal.dmg"
   name "Afk"
   desc "Break reminder app - step away from your keyboard"
-  homepage "https://github.com/Harry-kp/afk"
+  homepage "https://afk-app.vercel.app"
 
   livecheck do
-    url :url
+    url "https://github.com/Harry-kp/afk-releases/releases/latest"
     strategy :github_latest
   end
 
@@ -21,4 +21,3 @@ cask "afk" do
     "~/Library/Saved Application State/com.afk.app.savedState",
   ]
 end
-
