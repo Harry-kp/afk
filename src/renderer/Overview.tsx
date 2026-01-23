@@ -160,14 +160,7 @@ function Overview({
     <div className="flex flex-col h-[100vh] items-center justify-around text-white">
       <Toaster />
       <div className="text-base font-medium text-neutral-200 pb-16">
-        <img
-          className="inline-block align-bottom"
-          src="/icon.png"
-          alt="AFK"
-          width={24}
-          height={24}
-        />
-        &nbsp; Take a Break
+        👀 AFK
       </div>
       <div className="text-center">
         {!hasSession ? (
