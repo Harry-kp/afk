@@ -17,13 +17,15 @@ pub fn create_tray<R: Runtime>(app: &tauri::App<R>) -> Result<(), Box<dyn std::e
     // Build the tray menu
     let menu = build_tray_menu(handle, false, false)?;
     
-    // Load tray icon from embedded bytes
+    // Create tray icon with emoji title (macOS shows title in menu bar)
+    // We still need a minimal icon for the tray builder
     let icon = Image::from_bytes(include_bytes!("../icons/tray-icon.png"))?;
     
-    // Create tray icon
+    // Create tray icon with emoji as the visible element
     let _tray = TrayIconBuilder::with_id(TRAY_ID)
         .icon(icon)
         .icon_as_template(true)
+        .title("👀")
         .menu(&menu)
         .tooltip("AFK")
         .on_menu_event(move |app, event| {
@@ -247,14 +249,16 @@ pub fn update_tray_title<R: Runtime>(app: &AppHandle<R>, remaining_secs: i64) {
 /// Set a custom tray title
 pub fn set_tray_title<R: Runtime>(app: &AppHandle<R>, title: &str) {
     if let Some(tray) = app.tray_by_id(TRAY_ID) {
-        let _ = tray.set_title(Some(title));
+        // Prepend emoji to the title
+        let full_title = format!("👀 {}", title);
+        let _ = tray.set_title(Some(&full_title));
     }
 }
 
-/// Clear the tray title
+/// Clear the tray title (reset to just emoji)
 pub fn clear_tray_title<R: Runtime>(app: &AppHandle<R>) {
     if let Some(tray) = app.tray_by_id(TRAY_ID) {
-        let _ = tray.set_title(None::<&str>);
+        let _ = tray.set_title(Some("👀"));
     }
 }
 
