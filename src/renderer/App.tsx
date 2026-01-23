@@ -1,22 +1,35 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import { MemoryRouter as Router, Routes, Route } from 'react-router-dom';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Break from './Break';
 import Settings from './Settings';
-
-import './App.css';
 import Overview from './Overview';
 
+import './App.css';
+
 function ViewManager() {
-  const w = window.location;
-  const [showSettings, setShowSettings] = useState(w.search === '?settings');
+  const [showSettings, setShowSettings] = useState(false);
+  const [viewType, setViewType] = useState<string | null>(null);
 
-  const isSettings = w.search === '?settings';
-  const isDashboard = w.search === '?dashboard';
-  const isLongBreak = w.search === '?long-break';
-  const isBreak = w.search === '?break';
+  useEffect(() => {
+    // Get the view type from URL query params
+    const params = new URLSearchParams(window.location.search);
+    
+    if (params.has('settings')) {
+      setViewType('settings');
+      setShowSettings(true);
+    } else if (params.has('dashboard')) {
+      setViewType('dashboard');
+      setShowSettings(false);
+    } else if (params.has('long-break')) {
+      setViewType('long-break');
+    } else if (params.has('break')) {
+      setViewType('break');
+    } else {
+      // Default to dashboard
+      setViewType('dashboard');
+    }
+  }, []);
 
-  if (isDashboard || isSettings) {
+  if (viewType === 'settings' || viewType === 'dashboard') {
     return showSettings ? (
       <Settings setShowSettings={setShowSettings} />
     ) : (
@@ -24,19 +37,14 @@ function ViewManager() {
     );
   }
 
-  if (isBreak || isLongBreak) {
-    return <Break isLongBreak={isLongBreak} />;
+  if (viewType === 'break' || viewType === 'long-break') {
+    return <Break isLongBreak={viewType === 'long-break'} />;
   }
 
+  // Loading state
   return null;
 }
 
 export default function App() {
-  return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<ViewManager />} />
-      </Routes>
-    </Router>
-  );
+  return <ViewManager />;
 }

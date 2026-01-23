@@ -1,15 +1,31 @@
-/* eslint-disable import/prefer-default-export */
-
-import { useState } from 'react';
 import { Label } from './components/ui/label';
 import { Switch } from './components/ui/switch';
+import { useSetting } from './hooks/useSetting';
 
 export function StartupSettings() {
-  const launchAtLoginInStore = window.electron.store.get('launch_at_login');
-  const startTimerInStore = window.electron.store.get('start_timer');
+  const [launchAtLogin, setLaunchAtLogin, isLoading1] = useSetting<boolean>('launch_at_login', true);
+  const [startTimer, setStartTimer, isLoading2] = useSetting<boolean>('start_timer', false);
 
-  const [launchAtLogin, setLaunchAtLogin] = useState(launchAtLoginInStore);
-  const [startTimer, setStartTimer] = useState(startTimerInStore);
+  const isLoading = isLoading1 || isLoading2;
+
+  if (isLoading) {
+    return (
+      <div className="grid gap-4">
+        <div className="flex items-center justify-between space-x-2">
+          <Label className="flex flex-col space-y-1">
+            <span>Launch at login</span>
+          </Label>
+          <div className="w-11 h-6 bg-muted animate-pulse rounded-full" />
+        </div>
+        <div className="flex items-center justify-between space-x-2">
+          <Label className="flex flex-col space-y-1">
+            <span>Start timer automatically on launch</span>
+          </Label>
+          <div className="w-11 h-6 bg-muted animate-pulse rounded-full" />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="grid gap-4">
@@ -23,7 +39,6 @@ export function StartupSettings() {
           checked={launchAtLogin}
           onCheckedChange={(checked) => {
             setLaunchAtLogin(checked);
-            window.electron.store.set('launch_at_login', checked);
           }}
         />
       </div>
@@ -37,7 +52,6 @@ export function StartupSettings() {
           checked={startTimer}
           onCheckedChange={(checked) => {
             setStartTimer(checked);
-            window.electron.store.set('start_timer', checked);
           }}
         />
       </div>

@@ -1,10 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import confetti from 'canvas-confetti';
-import mixpanel from 'mixpanel-browser';
-import { DEFAULT_BREAK_DURATION } from '../main/constants';
+import { track } from './lib/analytics';
 import { AuroraBackground } from './components/ui/aurora-background';
 import { COPIES } from './constants';
+import { getCurrentWindow } from '@tauri-apps/api/window';
 
 function getTime(durationInSeconds: number) {
   const hours = Math.floor(durationInSeconds / 3600);
@@ -14,17 +14,14 @@ function getTime(durationInSeconds: number) {
   const result = { hrs: 0, mins: 0, secs: 0 };
 
   if (hours > 0) {
-    // result += `${hours}h`;
     result.hrs = hours;
   }
 
   if (minutes > 0) {
-    // result += `${minutes}m`;
     result.mins = minutes;
   }
 
   if (seconds > 0) {
-    // result += `${seconds}s`;
     result.secs = seconds;
   }
 
@@ -34,33 +31,64 @@ function getTime(durationInSeconds: number) {
 const copy = COPIES[Math.floor(Math.random() * COPIES.length)];
 
 function Break({ isLongBreak }: { isLongBreak: boolean }) {
-  const breakDurationInStore = window.electron.store.get('break_duration');
-  const longBreakDurationInStore = window.electron.store.get(
-    'long_break_duration',
-  );
-  const [seconds, setSeconds] = useState<number>(
-    isLongBreak
-      ? longBreakDurationInStore ?? DEFAULT_BREAK_DURATION
-      : breakDurationInStore ?? DEFAULT_BREAK_DURATION,
-  );
+  const [seconds, setSeconds] = useState<number | null>(null);
+  const [isClosing, setIsClosing] = useState(false);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Initialize break duration from store (must fetch from backend, not cache)
   useEffect(() => {
-    const interval = setInterval(() => {
-      setSeconds((prev) => prev - 1);
+    const initDuration = async () => {
+      const key = isLongBreak ? 'long_break_duration' : 'break_duration';
+      const defaultDuration = isLongBreak ? 120 : 30;
+      
+      // MUST use getAsync to fetch actual value from backend
+      // The break window is a new window with fresh cache defaults
+      const duration = await window.electron.store.getAsync<number>(key);
+      setSeconds(duration ?? defaultDuration);
+    };
+    initDuration();
+  }, [isLongBreak]);
+
+  // Countdown timer
+  useEffect(() => {
+    if (seconds === null) return;
+    
+    intervalRef.current = setInterval(() => {
+      setSeconds((prev) => {
+        if (prev === null) return null;
+        if (prev <= 1) {
+          // Clear interval and close
+          if (intervalRef.current) {
+            clearInterval(intervalRef.current);
+          }
+          return 0;
+        }
+        return prev - 1;
+      });
     }, 1000);
 
-    return () => clearInterval(interval);
-  }, []);
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
+    };
+  }, [seconds !== null]); // Only start when initialized
 
+  // Handle break end
   useEffect(() => {
-    if (seconds <= 0) {
-      window.electron.ipcRenderer.sendMessage('start-session');
-      window.close();
+    if (seconds === 0 && !isClosing) {
+      setIsClosing(true);
+      // End break and start new session
+      window.electron.session.endBreak();
+      getCurrentWindow().close().catch(console.error);
     }
-  }, [seconds]);
+  }, [seconds, isClosing]);
 
+  // Confetti effect for long breaks
   useEffect(() => {
+    if (!isLongBreak) return;
+    
     const end = Date.now() + 1.5 * 1000;
-
     const colors = ['#bb0000', '#ffffff'];
 
     (function frame() {
@@ -79,11 +107,40 @@ function Break({ isLongBreak }: { isLongBreak: boolean }) {
         colors,
       });
 
-      if (Date.now() < end && isLongBreak) {
+      if (Date.now() < end) {
         requestAnimationFrame(frame);
       }
     })();
   }, [isLongBreak]);
+
+  const handleSkipBreak = async () => {
+    if (isClosing) return;
+    setIsClosing(true);
+    
+    track('break_skipped');
+    await window.electron.session.skipBreak();
+    getCurrentWindow().close().catch(console.error);
+  };
+
+  const handleSnooze = async () => {
+    if (isClosing) return;
+    setIsClosing(true);
+    
+    track('break_snoozed');
+    await window.electron.session.snooze();
+    getCurrentWindow().close().catch(console.error);
+  };
+
+  // Show loading state while initializing
+  if (seconds === null) {
+    return (
+      <AuroraBackground>
+        <div className="flex items-center justify-center h-screen">
+          <div className="text-white text-2xl">Preparing your break...</div>
+        </div>
+      </AuroraBackground>
+    );
+  }
 
   const { mins, secs } = getTime(seconds);
 
@@ -100,58 +157,45 @@ function Break({ isLongBreak }: { isLongBreak: boolean }) {
         className="relative flex flex-col gap-4 items-center justify-center px-4"
       >
         <div className="grid grid-flow-col gap-5 text-center auto-cols-max">
-          {mins ? (
+          {mins > 0 && (
             <div className="flex flex-col p-2 rounded-box text-neutral-content">
               <span className="countdown font-mono text-5xl">
-                <span style={{ '--value': mins }} />
+                <span style={{ '--value': mins } as React.CSSProperties} />
               </span>
               mins
             </div>
-          ) : undefined}
-          {secs ? (
+          )}
             <div className="flex flex-col p-2 rounded-box text-neutral-content">
               <span className="countdown font-mono text-5xl">
-                <span style={{ '--value': secs }} />
+              <span style={{ '--value': secs } as React.CSSProperties} />
               </span>
               secs
             </div>
-          ) : undefined}
         </div>
-        {/* <div className="text-3xl md:text-7xl font-bold text-white text-center">
-          {isLongBreak ? 'Long break' : 'Short break'}
-        </div> */}
         <div className="text-3xl md:text-7xl font-bold text-white text-center">
           {copy.title}
         </div>
         <div className="font-extralight text-base md:text-4xl text-neutral-200 py-4">
           {copy.subtitle}
         </div>
+        <div className="flex gap-4">
         <button
           type="button"
-          className="bg-white rounded-full w-fit text-black px-4 py-2"
-          onClick={() => {
-            mixpanel.track('break_skipped');
-            window.electron.ipcRenderer.sendMessage('start-session');
-            window.close();
-            window.electron.ipcRenderer.sendMessage('skip-break');
-          }}
+            className="bg-white rounded-full w-fit text-black px-4 py-2 hover:bg-gray-200 transition-colors disabled:opacity-50"
+            onClick={handleSkipBreak}
+            disabled={isClosing}
         >
           Skip this break
         </button>
         <button
           type="button"
-          className=" bg-white rounded-full w-fit text-black px-4 py-2"
-          onClick={() => {
-            mixpanel.track('break_snoozed');
-            window.electron.ipcRenderer.sendMessage('skip-break');
-            window.close();
-            window.electron.ipcRenderer.sendMessage('start-session', {
-              snoozedForInSecs: 5 * 60,
-            });
-          }}
+            className="bg-white rounded-full w-fit text-black px-4 py-2 hover:bg-gray-200 transition-colors disabled:opacity-50"
+            onClick={handleSnooze}
+            disabled={isClosing}
         >
           Snooze for 5 minutes
         </button>
+        </div>
       </motion.div>
     </AuroraBackground>
   );

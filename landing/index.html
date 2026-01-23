@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AFK - Step Away From Your Keyboard</title>
+  <meta name="description" content="AFK is a break reminder app for developers. Take mindful breaks, protect your eyes, and boost your focus.">
+  <meta name="keywords" content="break reminder, pomodoro, developer tools, eye strain, productivity, macos app">
+  
+  <!-- Open Graph -->
+  <meta property="og:title" content="AFK - Step Away From Your Keyboard">
+  <meta property="og:description" content="A break reminder app for developers. Your eyes will thank you.">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="/assets/og-image.png">
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="/assets/icon.png">
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- Aurora Background -->
+  <div class="aurora-bg">
+    <div class="aurora"></div>
+  </div>
+
+  <!-- Main Content -->
+  <main>
+    <!-- Hero Section -->
+    <section class="hero">
+      <div class="hero-content">
+        <img src="/assets/icon.png" alt="AFK" class="hero-icon" width="80" height="80">
+        <h1>AFK</h1>
+        <p class="tagline">Step away from your keyboard.<br>Your eyes will thank you.</p>
+        
+        <div class="install-box">
+          <code class="install-command">brew install --cask afk</code>
+          <button class="copy-btn" onclick="copyCommand()">Copy</button>
+        </div>
+        
+        <p class="install-alt">
+          Don't have Homebrew? <a href="https://github.com/Harry-kp/afk/releases" target="_blank">Download directly</a>
+        </p>
+        
+        <div class="hero-screenshot">
+          <img src="/assets/screenshot.png" alt="AFK Screenshot" class="screenshot">
+        </div>
+      </div>
+    </section>
+
+    <!-- Story Section -->
+    <section class="story">
+      <div class="container">
+        <h2>Why AFK?</h2>
+        <div class="story-card">
+          <p class="story-text">
+            "I was debugging a nasty production issue at 2 AM. Four hours in, my eyes were burning, my neck was stiff. I didn't even notice until my vision started blurring.
+          </p>
+          <p class="story-text">
+            That's when I built AFK.
+          </p>
+          <p class="story-text">
+            Now, every 25 minutes, I step away. Just 30 seconds. Look out the window. Stretch. Breathe.
+          </p>
+          <p class="story-text highlight">
+            My eyes stopped hurting. My focus actually improved. The breaks I resisted? They made me faster.
+          </p>
+          <p class="story-author">— A developer who learned the hard way</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features">
+      <div class="container">
+        <h2>Simple by Design</h2>
+        <div class="features-grid">
+          <div class="feature-card">
+            <div class="feature-icon">👁️</div>
+            <h3>Subtle, Not Intrusive</h3>
+            <p>Fullscreen breaks that respect your flow. No annoying popups while you're deep in code.</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">⚙️</div>
+            <h3>Your Schedule, Your Rules</h3>
+            <p>Work sessions from 15-50 minutes. Breaks from 20 seconds to 1 minute. Long breaks after multiple sessions.</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">📍</div>
+            <h3>Lives in Your Menu Bar</h3>
+            <p>Starts with your Mac. Zero clicks to begin. Just launch and forget.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- How to Use Section -->
+    <section class="how-to">
+      <div class="container">
+        <h2>Get Started in 60 Seconds</h2>
+        <div class="steps">
+          <div class="step">
+            <div class="step-number">1</div>
+            <div class="step-content">
+              <h3>Install</h3>
+              <p>Open Terminal and run:</p>
+              <code>brew tap Harry-kp/tap && brew install --cask afk</code>
+              <p class="step-note">First launch: Right-click → Open → Open</p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-number">2</div>
+            <div class="step-content">
+              <h3>Start a Session</h3>
+              <p>Click the AFK icon in your menu bar and select "Start Session". Or open the app and hit the golden button.</p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-number">3</div>
+            <div class="step-content">
+              <h3>Take Your Breaks</h3>
+              <p>When time's up, a gentle fullscreen reminder appears. Look away from the screen. Blink. Stretch. That's it.</p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-number">4</div>
+            <div class="step-content">
+              <h3>Customize (Optional)</h3>
+              <p>Adjust session length, break duration, chime sounds, and more in Settings. Make it yours.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section class="testimonials">
+      <div class="container">
+        <h2>Stories from the Keyboard</h2>
+        <div class="testimonials-grid">
+          <div class="testimonial">
+            <p>"I used to skip lunch because I was 'in the zone.' Now AFK reminds me that the zone doesn't require destroying my body to stay in it."</p>
+            <span class="testimonial-author">— Backend Engineer</span>
+          </div>
+          <div class="testimonial">
+            <p>"My optometrist told me about the 20-20-20 rule years ago. I never followed it until AFK made it automatic. My dry eye symptoms are basically gone."</p>
+            <span class="testimonial-author">— Designer</span>
+          </div>
+          <div class="testimonial">
+            <p>"The best part? I actually feel MORE productive. Turns out 25 focused minutes beats 4 hours of half-attention every time."</p>
+            <span class="testimonial-author">— Indie Hacker</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta">
+      <div class="container">
+        <h2>Ready to treat your eyes better?</h2>
+        <div class="install-box large">
+          <code class="install-command">brew install --cask afk</code>
+          <button class="copy-btn" onclick="copyCommand()">Copy</button>
+        </div>
+        <p class="cta-subtext">Free forever. No account required. No tracking without consent.</p>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+      <div class="container">
+        <p>Made with care for developers who forget to blink.</p>
+        <div class="footer-links">
+          <a href="https://github.com/Harry-kp/afk" target="_blank">GitHub</a>
+          <a href="https://twitter.com/Harry_kp_" target="_blank">Twitter</a>
+          <span class="version">v1.0.0</span>
+        </div>
+      </div>
+    </footer>
+  </main>
+
+  <script>
+    function copyCommand() {
+      const command = 'brew install --cask afk';
+      navigator.clipboard.writeText(command).then(() => {
+        const btns = document.querySelectorAll('.copy-btn');
+        btns.forEach(btn => {
+          btn.textContent = 'Copied!';
+          setTimeout(() => btn.textContent = 'Copy', 2000);
+        });
+      });
+    }
+  </script>
+</body>
+</html>
+

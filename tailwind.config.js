@@ -1,16 +1,14 @@
-const {
-  default: flattenColorPalette,
-} = require('tailwindcss/lib/util/flattenColorPalette');
-const colors = require('tailwindcss/colors')
+import flattenColorPalette from 'tailwindcss/lib/util/flattenColorPalette';
+import colors from 'tailwindcss/colors';
+import tailwindcssAnimate from 'tailwindcss-animate';
+import daisyui from 'daisyui';
 
 /** @type {import('tailwindcss').Config} */
-module.exports = {
+export default {
   darkMode: ['class'],
   content: [
-    './pages/**/*.{ts,tsx}',
-    './components/**/*.{ts,tsx}',
-    './app/**/*.{ts,tsx}',
-    './src/**/*.{ts,tsx}',
+    './index.html',
+    './src/**/*.{js,ts,jsx,tsx}',
   ],
   prefix: '',
   theme: {
@@ -93,11 +91,15 @@ module.exports = {
       },
     },
   },
-  plugins: [require('tailwindcss-animate'), addVariablesForColors, require('daisyui')],
+  plugins: [
+    tailwindcssAnimate,
+    addVariablesForColors,
+    daisyui,
+  ],
 };
 
 // This plugin adds each Tailwind color as a global CSS variable, e.g. var(--gray-200).
-function addVariablesForColors({ addBase, theme }: any) {
+function addVariablesForColors({ addBase, theme }) {
   const allColors = flattenColorPalette(theme("colors"));
   const newVars = Object.fromEntries(
     Object.entries(allColors).map(([key, val]) => [`--${key}`, val])

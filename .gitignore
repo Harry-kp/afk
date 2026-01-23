@@ -1,34 +1,49 @@
 # Logs
 logs
 *.log
+npm-debug.log.*
 
 # Runtime data
 pids
 *.pid
 *.seed
 
-# Coverage directory used by tools like istanbul
+# Coverage directory
 coverage
 .eslintcache
 
-# Dependency directory
-# https://www.npmjs.org/doc/misc/npm-faq.html#should-i-check-my-node_modules-folder-into-git
+# Dependencies
 node_modules
 
-# OSX
+# OS files
 .DS_Store
+Thumbs.db
 
-release/app/dist
-release/build
-.erb/dll
-
+# IDE
 .idea
-npm-debug.log.*
+.vscode
+*.swp
+*.swo
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Build output
+dist/
+
+# Tauri
+src-tauri/target/
+src-tauri/gen/schemas/
+
+# TypeScript
+*.tsbuildinfo
+
+# CSS module types (auto-generated)
 *.css.d.ts
 *.sass.d.ts
 *.scss.d.ts
 
-.env
-
-# Sentry Config File
+# Sentry
 .env.sentry-build-plugin
