@@ -18,7 +18,7 @@ pub fn create_tray<R: Runtime>(app: &tauri::App<R>) -> Result<(), Box<dyn std::e
     let menu = build_tray_menu(handle, false, false)?;
     
     // Load tray icon from embedded bytes
-    let icon = Image::from_bytes(include_bytes!("../icons/icon.png"))?;
+    let icon = Image::from_bytes(include_bytes!("../icons/tray-icon.png"))?;
     
     // Create tray icon
     let _tray = TrayIconBuilder::with_id(TRAY_ID)
