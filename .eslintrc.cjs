@@ -24,9 +24,10 @@ module.exports = {
     'react/react-in-jsx-scope': 'off',
     'react/jsx-filename-extension': ['warn', { extensions: ['.tsx'] }],
     'react/jsx-props-no-spreading': 'off',
+    'react/prop-types': 'off', // Using TypeScript for prop validation
     '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
     '@typescript-eslint/no-explicit-any': 'warn',
-    'no-console': ['warn', { allow: ['warn', 'error', 'debug'] }],
+    'no-console': ['warn', { allow: ['warn', 'error', 'debug', 'log'] }],
   },
   settings: {
     react: {
@@ -41,3 +42,4 @@ module.exports = {
     '*.config.ts',
   ],
 };
+
