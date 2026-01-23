@@ -2,7 +2,6 @@ use crate::commands::{self, show_settings_window};
 use crate::state::AppState;
 use crate::utils::get_readable_time;
 use tauri::{
-    image::Image,
     menu::{MenuBuilder, MenuItemBuilder, PredefinedMenuItem, SubmenuBuilder},
     tray::{TrayIconBuilder, TrayIconEvent},
     AppHandle, Manager, Runtime,
@@ -17,13 +16,8 @@ pub fn create_tray<R: Runtime>(app: &tauri::App<R>) -> Result<(), Box<dyn std::e
     // Build the tray menu
     let menu = build_tray_menu(handle, false, false)?;
     
-    // Create tray icon with emoji title only (no visible icon)
-    // Using a 1x1 transparent PNG that won't be visible
-    let icon = Image::from_bytes(include_bytes!("../icons/tray-icon.png"))?;
-    
-    // Create tray - emoji title is the visible element, icon is hidden
+    // Create tray with emoji title only - no icon needed
     let _tray = TrayIconBuilder::with_id(TRAY_ID)
-        .icon(icon)
         .title("👀")
         .menu(&menu)
         .tooltip("AFK")
