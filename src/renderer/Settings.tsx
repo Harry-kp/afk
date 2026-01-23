@@ -104,7 +104,6 @@ function Settings({
             <TabsContent value="about">
               <div className="pt-8 text-center">
                 {/* App Logo & Name */}
-                <div className="text-6xl mb-4">👀</div>
                 <h1 className="text-3xl font-bold text-white mb-2">Afk</h1>
                 <p className="text-neutral-400 mb-1">Version {APP_VERSION}</p>
                 <p className="text-neutral-500 text-sm mb-8">Step away from your keyboard</p>
