@@ -16,10 +16,8 @@ fn main() {
         .plugin(tauri_plugin_notification::init())
         .plugin(tauri_plugin_autostart::init(
             tauri_plugin_autostart::MacosLauncher::LaunchAgent,
-            Some(vec!["--flag1", "--flag2"]),
+            Some(vec![]),
         ))
-        .plugin(tauri_plugin_shell::init())
-        .plugin(tauri_plugin_os::init())
         .manage(AppState::new())
         .setup(|app| {
             // Initialize the system tray
