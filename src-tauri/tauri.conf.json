@@ -1,6 +1,6 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "AFK",
+  "productName": "Afk",
   "version": "1.0.0",
   "identifier": "com.afk.app",
   "build": {
@@ -13,7 +13,7 @@
     "withGlobalTauri": true,
     "windows": [
       {
-        "title": "AFK",
+        "title": "Afk",
         "label": "main",
         "width": 1024,
         "height": 728,

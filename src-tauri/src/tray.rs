@@ -20,7 +20,7 @@ pub fn create_tray<R: Runtime>(app: &tauri::App<R>) -> Result<(), Box<dyn std::e
     let _tray = TrayIconBuilder::with_id(TRAY_ID)
         .title("👀")
         .menu(&menu)
-        .tooltip("AFK")
+        .tooltip("Afk")
         .on_menu_event(move |app, event| {
             handle_menu_event(app, event.id.as_ref());
         })

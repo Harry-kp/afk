@@ -160,7 +160,7 @@ function Overview({
     <div className="flex flex-col h-[100vh] items-center justify-around text-white">
       <Toaster />
       <div className="text-base font-medium text-neutral-200 pb-16">
-        👀 AFK
+        👀 Take a Break
       </div>
       <div className="text-center">
         {!hasSession ? (
@@ -187,7 +187,7 @@ function Overview({
         {hasSession ? (
           <>
             <div className="text-center text-sm font-normal text-neutral-200 py-4 mb-8">
-              AFK in action, your eyes will thank you!&nbsp;
+              Take a break in action, your eyes will thank you!&nbsp;
             </div>
             {isActive && (
               <div className="text-3xl font-normal text-white text-center">
