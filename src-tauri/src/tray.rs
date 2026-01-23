@@ -17,14 +17,13 @@ pub fn create_tray<R: Runtime>(app: &tauri::App<R>) -> Result<(), Box<dyn std::e
     // Build the tray menu
     let menu = build_tray_menu(handle, false, false)?;
     
-    // Create tray icon with emoji title (macOS shows title in menu bar)
-    // We still need a minimal icon for the tray builder
+    // Create tray icon with emoji title only (no visible icon)
+    // Using a 1x1 transparent PNG that won't be visible
     let icon = Image::from_bytes(include_bytes!("../icons/tray-icon.png"))?;
     
-    // Create tray icon with emoji as the visible element
+    // Create tray - emoji title is the visible element, icon is hidden
     let _tray = TrayIconBuilder::with_id(TRAY_ID)
         .icon(icon)
-        .icon_as_template(true)
         .title("👀")
         .menu(&menu)
         .tooltip("AFK")
