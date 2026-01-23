@@ -1,6 +1,13 @@
-# AFK
+# Afk
 
-**AFK** (Away From Keyboard) is a desktop application designed to help users maintain a healthy work-life balance by reminding them to take regular breaks during their work sessions. Built with Tauri for a lightweight, fast, and native experience.
+**Afk** (Away From Keyboard) is a desktop application designed to help users maintain a healthy work-life balance by reminding them to take regular breaks during their work sessions. Built with Tauri for a lightweight, fast, and native experience.
+
+## Quick Install (macOS)
+
+```bash
+brew tap Harry-kp/tap
+brew install --cask afk
+```
 
 ## Features
 
