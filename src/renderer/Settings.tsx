@@ -96,99 +96,40 @@ function Settings({
               </div>
             </TabsContent>
             <TabsContent value="about">
-              <div className="pt-6 max-w-lg mx-auto font-mono">
-                {/* Terminal-style header */}
-                <div className="bg-neutral-900 rounded-lg border border-neutral-800 overflow-hidden">
-                  {/* Terminal title bar */}
-                  <div className="bg-neutral-800 px-4 py-2 flex items-center gap-2">
-                    <div className="w-3 h-3 rounded-full bg-red-500" />
-                    <div className="w-3 h-3 rounded-full bg-yellow-500" />
-                    <div className="w-3 h-3 rounded-full bg-green-500" />
-                    <span className="text-neutral-500 text-xs ml-2">~/afk</span>
-                  </div>
-                  
-                  {/* Terminal content */}
-                  <div className="p-4 text-sm">
-                    <p className="text-green-400">$ cat README.md</p>
-                    <div className="mt-3 text-neutral-300">
-                      <p className="text-2xl mb-1">👀 <span className="text-white font-bold">Afk</span></p>
-                      <p className="text-neutral-500 text-xs mb-4">v{APP_VERSION} • Built with Rust + React</p>
-                      <p className="text-neutral-400 mb-4">
-                        A minimal break reminder.<br />
-                        No bloat. No ads. No BS.
-                      </p>
-                    </div>
-                    
-                    <p className="text-green-400 mt-4">$ whoami</p>
-                    <p className="text-neutral-300 mt-1">
-                      <a
-                        href={GITHUB_URL}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-blue-400 hover:underline"
-                        onClick={() => track('link_github')}
-                      >
-                        @Harry-kp
-                      </a>
-                      <span className="text-neutral-500"> — solo dev, shipping stuff</span>
-                    </p>
-
-                    <p className="text-green-400 mt-4">$ echo $LINKS</p>
-                    <div className="mt-1 flex gap-4">
-                      <a
-                        href={LANDING_URL}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-blue-400 hover:underline"
-                        onClick={() => track('link_website')}
-                      >
-                        [web]
-                      </a>
-                      <a
-                        href={TWITTER_URL}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-blue-400 hover:underline"
-                        onClick={() => track('link_twitter')}
-                      >
-                        [twitter]
-                      </a>
-                    </div>
-
-                    <p className="text-green-400 mt-4">$ ./share.sh</p>
-                    <div className="mt-2 flex gap-3">
-                      <button
-                        onClick={() => {
-                          track('share_twitter');
-                          window.open(
-                            `https://twitter.com/intent/tweet?text=${encodeURIComponent('👀 Afk - a minimal break reminder for devs who forget to blink.')}&url=${encodeURIComponent(LANDING_URL)}`,
-                            '_blank'
-                          );
-                        }}
-                        className="text-neutral-400 hover:text-white text-xs border border-neutral-700 px-2 py-1 rounded hover:border-neutral-500 transition-colors"
-                      >
-                        tweet
-                      </button>
-                      <button
-                        onClick={() => {
-                          track('share_copy_link');
-                          navigator.clipboard.writeText(LANDING_URL);
-                        }}
-                        className="text-neutral-400 hover:text-white text-xs border border-neutral-700 px-2 py-1 rounded hover:border-neutral-500 transition-colors"
-                      >
-                        copy link
-                      </button>
-                    </div>
-
-                    <p className="text-neutral-600 mt-6 text-xs">
-                      <span className="text-green-400">$</span> <span className="animate-pulse">_</span>
-                    </p>
-                  </div>
+              <div className="pt-8 text-center">
+                <p className="text-4xl mb-2">👀</p>
+                <h1 className="text-xl font-semibold text-white">Afk</h1>
+                <p className="text-neutral-500 text-sm mt-1">v{APP_VERSION}</p>
+                
+                <div className="mt-8 flex justify-center gap-6 text-sm">
+                  <a
+                    href={TWITTER_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-neutral-400 hover:text-white transition-colors"
+                  >
+                    Twitter
+                  </a>
+                  <a
+                    href={LANDING_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-neutral-400 hover:text-white transition-colors"
+                  >
+                    Website
+                  </a>
                 </div>
 
-                {/* Footer */}
-                <p className="text-neutral-600 text-xs text-center mt-4">
-                  shipped with caffeine & questionable sleep schedules
+                <p className="text-neutral-600 text-xs mt-8">
+                  by{' '}
+                  <a
+                    href={GITHUB_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-neutral-500 hover:text-white transition-colors"
+                  >
+                    Harry-kp
+                  </a>
                 </p>
               </div>
             </TabsContent>
