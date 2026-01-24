@@ -185,6 +185,15 @@ const app = {
   getConfigPath: async (): Promise<string | null> => {
     return await safeInvoke<string>('get_config_path');
   },
+  openUrl: async (url: string): Promise<void> => {
+    try {
+      const { openUrl } = await import('@tauri-apps/plugin-opener');
+      await openUrl(url);
+    } catch (e) {
+      // Fallback: try window.open
+      window.open(url, '_blank');
+    }
+  },
 };
 
 /**

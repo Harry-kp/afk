@@ -9,7 +9,6 @@ import {
   TimerReset,
   Volume2,
   Heart,
-  Twitter,
   Globe,
   Share2,
   ExternalLink,
@@ -18,6 +17,13 @@ import {
   RotateCcw,
   FileJson,
 } from 'lucide-react';
+
+// X (Twitter) icon - custom SVG since lucide doesn't have the new X logo
+const XIcon = ({ className }: { className?: string }) => (
+  <svg viewBox="0 0 24 24" className={className} fill="currentColor">
+    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+  </svg>
+);
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './components/ui/tabs';
 import { Separator } from './components/ui/separator';
@@ -215,7 +221,7 @@ function Settings({
                         );
                       }}
                     >
-                      <Twitter className="w-4 h-4 mr-2" />
+                      <XIcon className="w-4 h-4 mr-2" />
                       Tweet
                     </Button>
                     <Button
@@ -236,61 +242,53 @@ function Settings({
 
                 {/* Links */}
                 <div className="flex justify-center gap-6 mb-8">
-                  <a
-                    href={APP_INFO.website}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                  <button
+                    type="button"
                     className="text-neutral-400 hover:text-white transition-colors flex items-center gap-2"
-                    onClick={() => track('link_website')}
+                    onClick={() => { track('link_website'); window.electron.app.openUrl(APP_INFO.website); }}
                   >
                     <Globe className="w-4 h-4" />
                     Website
                     <ExternalLink className="w-3 h-3" />
-                  </a>
-                  <a
-                    href={AUTHORS.chaitanya.twitter}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                  </button>
+                  <button
+                    type="button"
                     className="text-neutral-400 hover:text-white transition-colors flex items-center gap-2"
-                    onClick={() => track('link_twitter_chaitanya')}
+                    onClick={() => { track('link_twitter_chaitanya'); window.electron.app.openUrl(AUTHORS.chaitanya.twitter); }}
                   >
-                    <Twitter className="w-4 h-4" />
+                    <XIcon className="w-4 h-4" />
                     {AUTHORS.chaitanya.twitterHandle}
                     <ExternalLink className="w-3 h-3" />
-                  </a>
-                  <a
-                    href={AUTHORS.harry.twitter}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                  </button>
+                  <button
+                    type="button"
                     className="text-neutral-400 hover:text-white transition-colors flex items-center gap-2"
-                    onClick={() => track('link_twitter_harry')}
+                    onClick={() => { track('link_twitter_harry'); window.electron.app.openUrl(AUTHORS.harry.twitter); }}
                   >
-                    <Twitter className="w-4 h-4" />
+                    <XIcon className="w-4 h-4" />
                     {AUTHORS.harry.twitterHandle}
                     <ExternalLink className="w-3 h-3" />
-                  </a>
+                  </button>
                 </div>
 
                 {/* Made with love */}
                 <div className="text-neutral-500 text-sm flex items-center justify-center gap-1 flex-wrap">
                   Developed by
-                  <a
-                    href={AUTHORS.chaitanya.github}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                  <button
+                    type="button"
                     className="text-neutral-400 hover:text-white transition-colors"
+                    onClick={() => window.electron.app.openUrl(AUTHORS.chaitanya.github)}
                   >
                     {AUTHORS.chaitanya.displayName}
-                  </a>
+                  </button>
                   &
-                  <a
-                    href={AUTHORS.harry.github}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                  <button
+                    type="button"
                     className="text-neutral-400 hover:text-white transition-colors"
+                    onClick={() => window.electron.app.openUrl(AUTHORS.harry.github)}
                   >
                     {AUTHORS.harry.displayName}
-                  </a>
+                  </button>
                 </div>
                 <p className="text-neutral-600 text-xs mt-2">
                   {APP_INFO.copyright}

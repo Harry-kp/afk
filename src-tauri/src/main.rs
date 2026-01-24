@@ -19,6 +19,7 @@ fn main() {
             tauri_plugin_autostart::MacosLauncher::LaunchAgent,
             Some(vec![]),
         ))
+        .plugin(tauri_plugin_opener::init())
         .manage(AppState::new())
         .setup(|app| {
             // Initialize settings persistence (load from disk)
