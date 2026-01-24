@@ -1,126 +1,95 @@
-# AFK
+<p align="center">
+  <img src="landing/assets/icon.png" alt="AFK" width="120" height="120">
+</p>
 
-**AFK** (Away From Keyboard) is a desktop application designed to help users maintain a healthy work-life balance by reminding them to take regular breaks during their work sessions. Built with Tauri for a lightweight, fast, and native experience.
+<h1 align="center">AFK</h1>
 
-## Quick Install (macOS)
+<p align="center">
+  <strong>A break reminder for developers who forget to blink.</strong>
+</p>
+
+<p align="center">
+  <a href="https://afk-app.vercel.app">Website</a> •
+  <a href="https://github.com/Harry-kp/afk-releases/releases/latest">Download</a> •
+  <a href="#install">Install</a>
+</p>
+
+---
+
+AFK is a lightweight break reminder that lives in your menu bar. It follows the 20-20-20 rule: every 20 minutes, look at something 20 feet away for 20 seconds. Simple, unobtrusive, effective.
+
+<p align="center">
+  <img src="landing/assets/screenshot.png" alt="AFK Screenshot" width="600">
+</p>
+
+## Install
+
+**Homebrew (recommended)**
 
 ```bash
 brew tap Harry-kp/tap
 brew install --cask afk
 ```
 
+**Direct Download**
+
+Download the latest `.dmg` from [releases](https://github.com/Harry-kp/afk-releases/releases/latest).
+
+> First launch: Right-click → Open → Open (required for apps outside the App Store)
+
 ## Features
 
-- Customizable work session durations
-- Automatic break reminders with fullscreen overlay
-- Configurable short and long break durations
-- Long break support after multiple work sessions
-- System tray timer display with remaining/elapsed time
-- Dashboard for session tracking
-- Pause and resume session functionality
-- Option to skip breaks or take them early
-- Pre-break notifications with optional chime sounds
-- Configurable chime sounds for different events
-- Launch at login capability
-- Cross-platform support (macOS, Windows, Linux)
+- **Fullscreen break reminders** — Gentle overlays that respect your workflow
+- **Configurable timing** — 15-50 min sessions, 20s-5 min breaks
+- **Long breaks** — Automatic extended breaks after multiple sessions
+- **Menu bar timer** — Always know when your next break is
+- **Skip or snooze** — You're in control
+- **Launch at login** — Set it and forget it
+- **No account required** — Your data stays on your machine
 
-## Installation
+## Why AFK?
 
-### Prerequisites
+Most break reminders are either too aggressive or too easy to ignore. AFK strikes a balance: a fullscreen reminder you can't miss, but with skip/snooze options when you're in flow. No guilt trips, no gamification—just a simple tool that does one thing well.
 
-- [Node.js](https://nodejs.org/) (v18 or higher)
-- [Rust](https://www.rust-lang.org/tools/install) (latest stable)
-- Platform-specific dependencies for Tauri:
-  - **macOS**: Xcode Command Line Tools
-  - **Windows**: Microsoft Visual Studio C++ Build Tools
-  - **Linux**: `build-essential`, `libwebkit2gtk-4.1-dev`, `libssl-dev`, `libgtk-3-dev`, `libayatana-appindicator3-dev`, `librsvg2-dev`
+## Development
 
-### Development
+```bash
+# Prerequisites: Node.js 18+, Rust, Xcode CLI tools (macOS)
 
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/Harry-kp/afk.git
-   cd afk
-   ```
+git clone https://github.com/Harry-kp/afk.git
+cd afk
+npm install
+npm run dev
+```
 
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
-
-3. Start the application in development mode:
-   ```bash
-   npm run dev
-   ```
-
-### Building for Production
+<details>
+<summary>Build for production</summary>
 
 ```bash
 npm run build
+# Output: src-tauri/target/release/bundle/
 ```
+</details>
 
-The built application will be available in `src-tauri/target/release/bundle/`.
+<details>
+<summary>Tech stack</summary>
 
-## Technology Stack
-
-- **Backend**: [Tauri](https://tauri.app/) + Rust
-- **Frontend**: React + TypeScript
-- **Build Tool**: Vite
-- **Styling**: Tailwind CSS + Radix UI
-- **Animations**: Framer Motion
-
-## Project Structure
-
-```
-afk/
-├── src/
-│   └── renderer/          # React frontend
-│       ├── components/    # UI components
-│       ├── lib/           # Utilities and Tauri bridge
-│       └── *.tsx          # Page components
-├── src-tauri/
-│   ├── src/               # Rust backend
-│   │   ├── main.rs        # Application entry point
-│   │   ├── commands.rs    # IPC command handlers
-│   │   ├── state.rs       # Session/settings state
-│   │   ├── tray.rs        # System tray
-│   │   └── utils.rs       # Utilities
-│   ├── icons/             # Application icons
-│   ├── resources/         # Audio files
-│   └── tauri.conf.json    # Tauri configuration
-├── index.html             # HTML entry point
-├── vite.config.ts         # Vite configuration
-└── package.json
-```
-
-## Configuration
-
-The application stores settings using Tauri's store plugin. Settings can be configured through the in-app Settings panel:
-
-- **Focus Duration**: Work session length (default: 25 minutes)
-- **Short Break**: Short break duration (default: 30 seconds)
-- **Long Break**: Long break duration (default: 2 minutes)
-- **Sessions Before Long Break**: Number of sessions before a long break
-- **Pre-break Notification**: Warning before break starts
-- **Chime Sounds**: Audio notifications for session events
-- **Launch at Login**: Start app automatically on system boot
+- **Framework**: Tauri + Rust
+- **Frontend**: React, TypeScript, Tailwind CSS
+- **Build**: Vite
+</details>
 
 ## Contributing
 
-Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+Contributions welcome. See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## License
 
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+MIT — see [LICENSE](LICENSE).
 
-## Author
+---
 
-Harry-kp
-- GitHub: [@Harry-kp](https://github.com/Harry-kp)
-- Email: chaudharyharshit9@gmail.com
-
-## Acknowledgments
-
-- Built with [Tauri](https://tauri.app/)
-- UI components from [Radix UI](https://www.radix-ui.com/)
-- Icons from [Lucide](https://lucide.dev/)
+<p align="center">
+  Built by <a href="https://github.com/Harry-kp">Harry</a> • 
+  <a href="https://twitter.com/Harry_kp_">Twitter</a>
+</p>
