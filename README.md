@@ -19,7 +19,7 @@
 AFK is a lightweight break reminder that lives in your menu bar. It follows the 20-20-20 rule: every 20 minutes, look at something 20 feet away for 20 seconds. Simple, unobtrusive, effective.
 
 <p align="center">
-  <img src="landing/assets/screenshot.png" alt="AFK Screenshot" width="600">
+  <img src="landing/assets/demo.gif" alt="AFK Demo" width="600">
 </p>
 
 ## Install

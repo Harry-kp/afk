@@ -22,206 +22,359 @@
   <meta name="twitter:title" content="AFK - Step Away From Your Keyboard">
   <meta name="twitter:description" content="A break reminder app for developers. Your eyes will thank you.">
   <meta name="twitter:image" content="https://afk-app.vercel.app/assets/og-image.png">
-  <meta name="twitter:creator" content="@Harshitc007">
+  <meta name="twitter:creator" content="@Harry_kp_">
   
   <!-- Favicon -->
-  <link rel="icon" type="image/png" href="/assets/icon.png">
-  <link rel="apple-touch-icon" href="/assets/icon.png">
+  <link rel="icon" type="image/png" href="assets/icon.png">
+  <link rel="apple-touch-icon" href="assets/icon.png">
   
-  <!-- Fonts -->
+  <!-- Fonts - Satoshi (premium sans-serif) + JetBrains Mono -->
+  <link rel="preconnect" href="https://api.fontshare.com">
+  <link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&display=swap" rel="stylesheet">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <!-- Aurora Background -->
-  <div class="aurora-bg">
-    <div class="aurora"></div>
-  </div>
+  <!-- Background Effects -->
+  <div class="noise-overlay" aria-hidden="true"></div>
+  <div class="grid-pattern" aria-hidden="true"></div>
+  <div class="ambient-glow ambient-glow--primary" aria-hidden="true"></div>
+  <div class="ambient-glow ambient-glow--secondary" aria-hidden="true"></div>
 
-  <!-- Main Content -->
+  <!-- Navbar -->
+  <nav class="navbar" id="navbar">
+    <div class="navbar-inner">
+      <a href="/" class="navbar-logo">
+        <img src="assets/icon.png" alt="AFK">
+        <span>AFK</span>
+      </a>
+      <div class="navbar-cta">
+        <a href="#features" class="btn btn-ghost">Features</a>
+        <a href="#" class="btn btn-primary" onclick="downloadDMG(event)">
+          Download
+        </a>
+      </div>
+    </div>
+  </nav>
+
   <main>
     <!-- Hero Section -->
     <section class="hero">
       <div class="hero-content">
-        <img src="/assets/icon.png" alt="Afk" class="hero-icon" width="80" height="80">
-        <h1>AFK</h1>
-        <p class="tagline">Step away from your keyboard.<br>Your eyes will thank you.</p>
-        
-        <div class="download-options">
-          <a href="#" id="download-btn" class="download-btn primary" onclick="downloadDMG(event)">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-              <polyline points="7 10 12 15 17 10"/>
-              <line x1="12" y1="15" x2="12" y2="3"/>
-            </svg>
-            Download for macOS
-          </a>
-          <div class="install-box">
-            <code class="install-command">brew install --cask afk</code>
-            <button class="copy-btn" onclick="copyCommand()">Copy</button>
-          </div>
+        <div class="hero-badge" data-animate>
+          <span class="hero-badge-dot"></span>
+          <span>Free Forever</span>
         </div>
         
-        <p class="install-alt">
-          <a href="#install">First time? See setup instructions below</a>
+        <h1 data-animate data-animate-delay="1">
+          Your eyes deserve<br>
+          <span class="hero-headline-accent">a break</span>
+        </h1>
+        
+        <p class="hero-tagline" data-animate data-animate-delay="2">
+          The minimal break reminder that respects your flow. 
+          Built for developers who forget to blink.
         </p>
         
-        <div class="hero-screenshot">
-          <img src="/assets/screenshot.png" alt="AFK Screenshot" class="screenshot">
-        </div>
-      </div>
-    </section>
-
-    <!-- Story Section -->
-    <section class="story">
-      <div class="container">
-        <h2>Why I Built This</h2>
-        <div class="story-card">
-          <p class="story-text">
-            It was 2 AM. I was four hours deep into debugging a production issue. My eyes were burning, my neck was stiff, and I hadn't blinked in what felt like forever.
-          </p>
-          <p class="story-text">
-            I only noticed when my vision started blurring.
-          </p>
-          <p class="story-text">
-            Sound familiar? We developers are notorious for losing ourselves in code. "Just one more fix." "Almost got it." Before you know it, hours have passed and your body is screaming at you.
-          </p>
-          <p class="story-text highlight">
-            So I built AFK. Not another fancy productivity app. Just a simple reminder to step away, look at something 20 feet away, and give your eyes a break.
-          </p>
-          <p class="story-text">
-            Now I take a 30-second break every 25 minutes. My eyes don't hurt anymore. And honestly? I code better. Turns out the breaks I resisted were making me slower.
-          </p>
-          <p class="story-author">— Harry, the developer behind AFK</p>
-        </div>
-      </div>
-    </section>
-
-    <!-- Features Section -->
-    <section class="features">
-      <div class="container">
-        <h2>Simple by Design</h2>
-        <div class="features-grid">
-          <div class="feature-card">
-            <div class="feature-icon">👁️</div>
-            <h3>Respects Your Flow</h3>
-            <p>A gentle fullscreen reminder when it's break time. No annoying popups while you're deep in code. Skip or snooze if you really need to.</p>
+        <div class="hero-actions" data-animate data-animate-delay="3">
+          <div class="hero-buttons">
+            <a href="#" class="btn btn-primary btn-lg" id="download-btn" onclick="downloadDMG(event)">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="7 10 12 15 17 10"/>
+                <line x1="12" y1="15" x2="12" y2="3"/>
+              </svg>
+              Download for macOS
+            </a>
+            <a href="#features" class="btn btn-glass btn-lg">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/>
+                <polyline points="12 16 16 12 12 8"/>
+                <line x1="8" y1="12" x2="16" y2="12"/>
+              </svg>
+              See Features
+            </a>
           </div>
-          <div class="feature-card">
-            <div class="feature-icon">⚙️</div>
-            <h3>Your Rules</h3>
-            <p>15-50 minute work sessions. 20 second to 1 minute breaks. Long breaks after multiple sessions. Customize everything or use the defaults.</p>
-          </div>
-          <div class="feature-card">
-            <div class="feature-icon">📍</div>
-            <h3>Set It and Forget It</h3>
-            <p>Lives in your menu bar. Starts with your Mac. One click to begin a session. That's it. No accounts, no cloud, no complexity.</p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- How to Use Section -->
-    <section class="how-to" id="install">
-      <div class="container">
-        <h2>Get Started in 60 Seconds</h2>
-        <div class="steps">
-          <div class="step">
-            <div class="step-number">1</div>
-            <div class="step-content">
-              <h3>Download &amp; Install</h3>
-              <p><strong>Option A:</strong> Direct download</p>
-              <a href="#" id="step-download-btn" class="step-download-btn" onclick="downloadDMG(event)">Download DMG</a>
-              <p class="step-note">Open the DMG and drag Afk to Applications.</p>
-              <p style="margin-top: 1rem;"><strong>Option B:</strong> Via Homebrew</p>
-              <code>brew tap Harry-kp/tap && brew install --cask afk</code>
-              <p class="step-note">Don't have Homebrew? Get it at <a href="https://brew.sh" target="_blank">brew.sh</a></p>
-            </div>
-          </div>
-          <div class="step">
-            <div class="step-number">2</div>
-            <div class="step-content">
-              <h3>First Launch</h3>
-              <p>macOS will ask for permission since AFK isn't from the App Store. Just right-click the app → Open → Open. You only need to do this once.</p>
-            </div>
-          </div>
-          <div class="step">
-            <div class="step-number">3</div>
-            <div class="step-content">
-              <h3>Start a Session</h3>
-              <p>Click the 👀 icon in your menu bar → Start Session. Or open the app and hit the golden button. The timer starts counting down.</p>
-            </div>
-          </div>
-          <div class="step">
-            <div class="step-number">4</div>
-            <div class="step-content">
-              <h3>Take Your Breaks</h3>
-              <p>When time's up, a fullscreen reminder appears. Look away from the screen. Blink a few times. Stretch if you want. 30 seconds later, you're back to work.</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- The Science Section -->
-    <section class="science">
-      <div class="container">
-        <h2>The 20-20-20 Rule</h2>
-        <div class="science-content">
-          <p>
-            Eye doctors recommend this simple rule: Every <strong>20 minutes</strong>, look at something <strong>20 feet away</strong> for <strong>20 seconds</strong>.
-          </p>
-          <p>
-            It helps prevent digital eye strain, reduces dry eyes, and keeps your focus sharp. The problem? Nobody actually does it.
-          </p>
-          <p>
-            AFK makes it automatic. You don't have to remember. You don't have to set timers. Just work, and AFK will remind you when it's time to look away.
-          </p>
-        </div>
-      </div>
-    </section>
-
-    <!-- CTA Section -->
-    <section class="cta">
-      <div class="container">
-        <h2>Ready to treat your eyes better?</h2>
-        <div class="cta-buttons">
-          <a href="#" id="cta-download-btn" class="download-btn primary large" onclick="downloadDMG(event)">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-              <polyline points="7 10 12 15 17 10"/>
-              <line x1="12" y1="15" x2="12" y2="3"/>
-            </svg>
-            Download for macOS
-          </a>
-          <div class="install-box large">
-            <code class="install-command">brew install --cask afk</code>
+          
+          <div class="install-box">
+            <code>brew install --cask afk</code>
             <button class="copy-btn" onclick="copyCommand()">Copy</button>
           </div>
         </div>
-        <p class="cta-subtext">Free forever. No account. No tracking. Just a simple tool that does one thing well.</p>
+        
+        <p class="hero-note" data-animate data-animate-delay="4">
+          <a href="#install">First time? See setup instructions</a>
+          <span class="hero-note-divider">•</span>
+          <span class="hero-note-platform">macOS only</span>
+        </p>
+        
+        <!-- Notice for non-macOS users -->
+        <div class="platform-notice" id="platform-notice" data-animate data-animate-delay="4">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="12" y1="8" x2="12" y2="12"/>
+            <line x1="12" y1="16" x2="12.01" y2="16"/>
+          </svg>
+          <span>AFK is currently macOS only. Windows & Linux coming soon.</span>
+        </div>
+      </div>
+      
+      <!-- Video Showcase -->
+      <div class="hero-video-container" data-animate data-animate-delay="4">
+        <div class="video-glow" aria-hidden="true"></div>
+        <div class="video-wrapper">
+          <video 
+            id="product-video"
+            autoplay 
+            loop 
+            muted 
+            playsinline
+            poster="assets/screenshot.png"
+          >
+            <source src="https://github.com/Harry-kp/afk-releases/releases/download/v1.0.0/demo.webm" type="video/webm">
+            <source src="https://github.com/Harry-kp/afk-releases/releases/download/v1.0.0/demo.mp4" type="video/mp4">
+            <img src="assets/screenshot.png" alt="AFK Screenshot">
+          </video>
+        </div>
       </div>
     </section>
 
-    <!-- Footer -->
-    <footer>
+    <!-- Social Proof -->
+    <section class="social-proof">
       <div class="container">
-        <p>Built with care by a developer who forgot to blink.</p>
-        <div class="footer-links">
-          <a href="https://twitter.com/Harry_kp_" target="_blank">Follow for updates</a>
-          <a href="mailto:chaudharyharshit9@gmail.com">Feedback? Email me</a>
-          <a href="https://github.com/Harry-kp/afk-releases/releases/latest" target="_blank" class="version" id="version">v1.0.0</a>
+        <div class="social-proof-inner">
+          <p class="social-proof-text">
+            Trusted by <strong>developers</strong> who care about their health
+          </p>
+          <div class="social-proof-divider" aria-hidden="true"></div>
+          <div class="social-proof-stats">
+            <div class="stat">
+              <div class="stat-value">100%</div>
+              <div class="stat-label">Free</div>
+            </div>
+            <div class="stat">
+              <div class="stat-value">0</div>
+              <div class="stat-label">Tracking</div>
+            </div>
+            <div class="stat">
+              <div class="stat-value">&lt;5MB</div>
+              <div class="stat-label">Size</div>
+            </div>
+          </div>
         </div>
       </div>
-    </footer>
+    </section>
+
+    <!-- Features - Bento Grid -->
+    <section class="features" id="features">
+      <div class="container">
+        <header class="features-header" data-animate>
+          <h2>Simple by Design</h2>
+          <p>Everything you need, nothing you don't.</p>
+        </header>
+        
+        <div class="bento-grid">
+          <!-- Left: Large card with image -->
+          <div class="bento-card bento-card--hero" data-animate data-animate-delay="1">
+            <div class="bento-icon">👁️</div>
+            <h3>Respects Your Flow</h3>
+            <p>A gentle fullscreen reminder when it's break time. No annoying popups while you're deep in code. Skip or snooze when you really need to.</p>
+            <div class="bento-illustration">
+              <img src="assets/break.png" alt="AFK break screen overlay">
+            </div>
+          </div>
+          
+          <!-- Right: 3 stacked cards -->
+          <div class="bento-stack">
+            <div class="bento-card bento-card--stacked" data-animate data-animate-delay="2">
+              <div class="bento-icon">⚡</div>
+              <h3>Lightning Fast</h3>
+              <p>Built with Rust. Uses minimal resources. Starts instantly with your Mac.</p>
+            </div>
+            
+            <div class="bento-card bento-card--stacked" data-animate data-animate-delay="3">
+              <div class="bento-icon">⚙️</div>
+              <h3>Your Rules</h3>
+              <p>15-50 min sessions. 20s to 5 min breaks. Customize everything or use smart defaults.</p>
+            </div>
+            
+            <div class="bento-card bento-card--stacked" data-animate data-animate-delay="4">
+              <div class="bento-icon">📍</div>
+              <h3>Set It and Forget It</h3>
+              <p>Lives in your menu bar. One click to start. No accounts, no cloud, no complexity.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- How It Works -->
+    <section class="how-it-works" id="install">
+      <div class="container">
+        <header class="how-it-works-header" data-animate>
+          <h2>Get Started in 30 Seconds</h2>
+        </header>
+        
+        <div class="steps-grid">
+          <div class="step-card" data-animate data-animate-delay="1">
+            <div class="step-number">1</div>
+            <h3>Install</h3>
+            <p>Download the DMG or install via Homebrew. Drag to Applications.</p>
+          </div>
+          
+          <div class="step-card" data-animate data-animate-delay="2">
+            <div class="step-number">2</div>
+            <h3>Launch</h3>
+            <p>Right-click → Open (just once). Click the 👀 icon in your menu bar.</p>
+          </div>
+          
+          <div class="step-card" data-animate data-animate-delay="3">
+            <div class="step-number">3</div>
+            <h3>Work</h3>
+            <p>Start a session. When time's up, look away for 30 seconds. That's it.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- The Science -->
+    <section class="science">
+      <div class="container">
+        <div class="science-card" data-animate>
+          <h2 class="science-title">The 20-20-20 Rule</h2>
+          
+          <div class="science-rule">
+            <div class="rule-item">
+              <div class="rule-number">20</div>
+              <div class="rule-unit">minutes</div>
+              <div class="rule-label">Work time</div>
+            </div>
+            <div class="rule-item">
+              <div class="rule-number">20</div>
+              <div class="rule-unit">feet</div>
+              <div class="rule-label">Look away</div>
+            </div>
+            <div class="rule-item">
+              <div class="rule-number">20</div>
+              <div class="rule-unit">seconds</div>
+              <div class="rule-label">Break time</div>
+            </div>
+          </div>
+          
+          <p class="science-description">
+            Eye doctors recommend this simple rule to prevent digital eye strain. 
+            The problem? Nobody actually does it. AFK makes it automatic.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Story -->
+    <section class="story">
+      <div class="container">
+        <div class="story-card" data-animate>
+          <blockquote class="story-quote">
+            It was 2 AM. I was four hours deep into debugging. My eyes were burning, 
+            my neck was stiff, and I hadn't blinked in what felt like forever. 
+            Sound familiar? That's why I built AFK. Now I take a 30-second break 
+            every 25 minutes. My eyes don't hurt anymore. And honestly? I code better.
+          </blockquote>
+          
+          <div class="story-author">
+            <div class="story-author-avatar">👨‍💻</div>
+            <div class="story-author-info">
+              <div class="story-author-name">Harry-kp</div>
+              <div class="story-author-role">Creator of AFK</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="cta">
+      <div class="container">
+        <div class="cta-card" data-animate>
+          <div class="cta-content">
+            <h2>Ready to treat your eyes better?</h2>
+            <p class="cta-subtitle">Free forever. No account. No tracking.</p>
+            
+            <div class="cta-buttons">
+              <a href="#" class="btn btn-primary btn-lg" id="cta-download-btn" onclick="downloadDMG(event)">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                  <polyline points="7 10 12 15 17 10"/>
+                  <line x1="12" y1="15" x2="12" y2="3"/>
+                </svg>
+                Download for macOS
+              </a>
+              
+              <div class="install-box">
+                <code>brew tap Harry-kp/tap && brew install --cask afk</code>
+                <button class="copy-btn" onclick="copyCommand()">Copy</button>
+              </div>
+            </div>
+            
+            <p class="cta-note">
+              Works on macOS 11+ • Apple Silicon & Intel
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
   </main>
 
-  <script>
-    let latestRelease = null;
+  <!-- Footer -->
+  <footer>
+    <div class="container">
+      <div class="footer-inner">
+        <div class="footer-brand">
+          <img src="assets/icon.png" alt="AFK">
+          <span>Built with care by a developer who forgot to blink.</span>
+        </div>
+        
+        <div class="footer-links">
+          <a href="https://twitter.com/Harry_kp_" target="_blank">Twitter</a>
+          <a href="https://github.com/Harry-kp" target="_blank">GitHub</a>
+          <a href="mailto:chaudharyharshit9@gmail.com">Contact</a>
+          <a href="https://github.com/Harry-kp/afk-releases/releases/latest" target="_blank" class="footer-version" id="version">v1.0.0</a>
+        </div>
+      </div>
+    </div>
+  </footer>
 
+  <script>
+    // Navbar scroll effect
+    const navbar = document.getElementById('navbar');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 50) {
+        navbar.classList.add('scrolled');
+      } else {
+        navbar.classList.remove('scrolled');
+      }
+    });
+
+    // Scroll animations with Intersection Observer
+    const animatedElements = document.querySelectorAll('[data-animate]');
+    
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, {
+      threshold: 0.1,
+      rootMargin: '0px 0px -50px 0px'
+    });
+
+    animatedElements.forEach(el => observer.observe(el));
+
+    // Copy command
     function copyCommand() {
       const command = 'brew tap Harry-kp/tap && brew install --cask afk';
       navigator.clipboard.writeText(command).then(() => {
@@ -233,17 +386,19 @@
       });
     }
 
+    // Download handling
+    let latestRelease = null;
+
     function downloadDMG(event) {
       event.preventDefault();
       if (latestRelease && latestRelease.dmgUrl) {
         window.location.href = latestRelease.dmgUrl;
       } else {
-        // Fallback to releases page
         window.open('https://github.com/Harry-kp/afk-releases/releases/latest', '_blank');
       }
     }
 
-    // Fetch latest version from public releases repo
+    // Fetch latest version
     fetch('https://api.github.com/repos/Harry-kp/afk-releases/releases/latest')
       .then(res => res.json())
       .then(data => {
@@ -251,7 +406,6 @@
           const version = data.tag_name;
           document.getElementById('version').textContent = version;
           
-          // Find the DMG asset
           const dmgAsset = data.assets?.find(a => a.name.endsWith('.dmg'));
           if (dmgAsset) {
             latestRelease = {
@@ -259,22 +413,38 @@
               dmgUrl: dmgAsset.browser_download_url
             };
             
-            // Update download button text with version
-            const downloadBtns = document.querySelectorAll('.download-btn.primary');
+            // Update download buttons
+            const downloadBtns = document.querySelectorAll('#download-btn, #cta-download-btn');
             downloadBtns.forEach(btn => {
-              btn.innerHTML = `
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                  <polyline points="7 10 12 15 17 10"/>
-                  <line x1="12" y1="15" x2="12" y2="3"/>
-                </svg>
-                Download ${version}
-              `;
+              const svg = btn.querySelector('svg').outerHTML;
+              btn.innerHTML = `${svg} Download ${version}`;
             });
           }
         }
       })
       .catch(() => {});
+
+    // Bento card hover effect (mouse tracking)
+    document.querySelectorAll('.bento-card').forEach(card => {
+      card.addEventListener('mousemove', (e) => {
+        const rect = card.getBoundingClientRect();
+        const x = ((e.clientX - rect.left) / rect.width) * 100;
+        const y = ((e.clientY - rect.top) / rect.height) * 100;
+        card.style.setProperty('--mouse-x', `${x}%`);
+        card.style.setProperty('--mouse-y', `${y}%`);
+      });
+    });
+
+    // Detect non-macOS users and show platform notice
+    const isMac = navigator.platform.toLowerCase().includes('mac') || 
+                  navigator.userAgent.toLowerCase().includes('mac');
+    
+    if (!isMac) {
+      const notice = document.getElementById('platform-notice');
+      if (notice) {
+        notice.classList.add('is-visible');
+      }
+    }
   </script>
 </body>
 </html>
