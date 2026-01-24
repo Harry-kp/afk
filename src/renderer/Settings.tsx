@@ -80,7 +80,7 @@ function DataSettings() {
           title="Copy path"
         >
           {copied ? (
-            <Check className="w-4 h-4 text-green-500" />
+            <Check className="w-4 h-4 text-yellow-500" />
           ) : (
             <Copy className="w-4 h-4 text-muted-foreground" />
           )}
