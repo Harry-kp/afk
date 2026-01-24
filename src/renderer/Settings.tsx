@@ -215,10 +215,8 @@ function Settings({
                       size="sm"
                       onClick={() => {
                         track('share_twitter');
-                        window.open(
-                          `https://twitter.com/intent/tweet?text=${encodeURIComponent('👀 Taking better care of my eyes with AFK - a beautiful break reminder app for developers. Check it out!')}&url=${encodeURIComponent(APP_INFO.website)}`,
-                          '_blank'
-                        );
+                        const tweetUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent('👀 Taking better care of my eyes with AFK - a beautiful break reminder app for developers. Check it out!')}&url=${encodeURIComponent(APP_INFO.website)}`;
+                        window.electron.app.openUrl(tweetUrl);
                       }}
                     >
                       <XIcon className="w-4 h-4 mr-2" />

@@ -187,10 +187,13 @@ const app = {
   },
   openUrl: async (url: string): Promise<void> => {
     try {
-      const { openUrl } = await import('@tauri-apps/plugin-opener');
-      await openUrl(url);
+      const { openUrl: tauriOpenUrl } = await import('@tauri-apps/plugin-opener');
+      console.log('Opening URL with Tauri opener:', url);
+      await tauriOpenUrl(url);
     } catch (e) {
+      console.error('Failed to open URL with Tauri opener:', e);
       // Fallback: try window.open
+      console.log('Trying fallback window.open');
       window.open(url, '_blank');
     }
   },
