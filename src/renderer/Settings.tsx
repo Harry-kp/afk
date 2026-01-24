@@ -273,7 +273,7 @@ function Settings({
 
                 {/* Made with love */}
                 <div className="text-neutral-500 text-sm flex items-center justify-center gap-1 flex-wrap">
-                  Made with <Heart className="w-4 h-4 text-red-500 fill-red-500" /> by
+                  Developed by
                   <a
                     href={AUTHORS.chaitanya.github}
                     target="_blank"

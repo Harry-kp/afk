@@ -36,6 +36,7 @@
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   
   <link rel="stylesheet" href="styles.css">
+  <script src="constants.js"></script>
 </head>
 <body>
   <!-- Background Effects -->
@@ -333,13 +334,13 @@
       <div class="footer-inner">
         <div class="footer-brand">
           <img src="assets/icon.png" alt="AFK">
-          <span>Built with care by <a href="https://github.com/holaChaitanya" target="_blank">Chaitanya</a> & <a href="https://github.com/Harry-kp" target="_blank">Harry</a></span>
+          <span>Built by <a data-const-href="AUTHORS.chaitanya.github" target="_blank" data-const="AUTHORS.chaitanya.displayName">Chaitanya</a> & <a data-const-href="AUTHORS.harry.github" target="_blank" data-const="AUTHORS.harry.displayName">Harry-kp</a></span>
         </div>
         
         <div class="footer-links">
-          <a href="https://x.com/holaChaitanya" target="_blank">@holaChaitanya</a>
-          <a href="https://x.com/Harry_kp_" target="_blank">@Harry_kp_</a>
-          <a href="https://github.com/Harry-kp/afk-releases/releases/latest" target="_blank" class="footer-version" id="version">v1.0.0</a>
+          <a data-const-href="AUTHORS.chaitanya.twitter" target="_blank" data-const="AUTHORS.chaitanya.twitterHandle">@holaChaitanya</a>
+          <a data-const-href="AUTHORS.harry.twitter" target="_blank" data-const="AUTHORS.harry.twitterHandle">@Harshitc007</a>
+          <a data-const-href="APP_INFO.releases" target="_blank" class="footer-version" id="version">v1.0.0</a>
         </div>
       </div>
     </div>
@@ -375,8 +376,7 @@
 
     // Copy command
     function copyCommand() {
-      const command = 'brew tap Harry-kp/tap && brew install --cask afk';
-      navigator.clipboard.writeText(command).then(() => {
+      navigator.clipboard.writeText(APP_INFO.homebrew).then(() => {
         const btns = document.querySelectorAll('.copy-btn');
         btns.forEach(btn => {
           btn.textContent = 'Copied!';
@@ -393,7 +393,7 @@
       if (latestRelease && latestRelease.dmgUrl) {
         window.location.href = latestRelease.dmgUrl;
       } else {
-        window.open('https://github.com/Harry-kp/afk-releases/releases/latest', '_blank');
+        window.open(APP_INFO.releases, '_blank');
       }
     }
 
