@@ -470,7 +470,7 @@ pub async fn create_break_windows<R: Runtime>(app: &AppHandle<R>) {
     let monitors = app.available_monitors().unwrap_or_default();
     
     let break_type = if is_long_break { "long-break" } else { "break" };
-    let url = format!("index.html?{}", break_type);
+    let url = format!("index.html?{}&duration={}", break_type, break_duration);
     
     for (i, monitor) in monitors.iter().enumerate() {
         let label = format!("break_{}", i);

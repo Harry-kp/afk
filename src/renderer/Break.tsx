@@ -33,8 +33,9 @@ const copy = COPIES[Math.floor(Math.random() * COPIES.length)];
 // Start fading out when this many seconds are left
 const FADE_START_SECONDS = 3;
 
-function Break({ isLongBreak }: { isLongBreak: boolean }) {
-  const [seconds, setSeconds] = useState<number | null>(null);
+function Break({ isLongBreak, initialDuration }: { isLongBreak: boolean; initialDuration: number }) {
+  // Initialize with the duration from URL - no loading state needed
+  const [seconds, setSeconds] = useState<number>(initialDuration);
   const [isClosing, setIsClosing] = useState(false);
   const [isFading, setIsFading] = useState(false);
 
@@ -57,7 +58,7 @@ function Break({ isLongBreak }: { isLongBreak: boolean }) {
 
   // Start fading when approaching end
   useEffect(() => {
-    if (seconds !== null && seconds <= FADE_START_SECONDS && seconds > 0 && !isFading) {
+    if (seconds <= FADE_START_SECONDS && seconds > 0 && !isFading) {
       setIsFading(true);
     }
   }, [seconds, isFading]);
@@ -110,17 +111,6 @@ function Break({ isLongBreak }: { isLongBreak: boolean }) {
     // Backend will close all windows
     await window.electron.session.snooze();
   };
-
-  // Show loading state while waiting for first tick
-  if (seconds === null) {
-    return (
-      <AuroraBackground>
-        <div className="flex items-center justify-center h-screen">
-          <div className="text-white text-2xl">Preparing your break...</div>
-        </div>
-      </AuroraBackground>
-    );
-  }
 
   const { mins, secs } = getTime(seconds);
 

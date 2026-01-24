@@ -9,6 +9,7 @@ import './App.css';
 function ViewManager() {
   const [showSettings, setShowSettings] = useState(false);
   const [viewType, setViewType] = useState<string | null>(null);
+  const [breakDuration, setBreakDuration] = useState<number>(30);
 
   useEffect(() => {
     // Get the view type from URL query params
@@ -22,8 +23,12 @@ function ViewManager() {
       setShowSettings(false);
     } else if (params.has('long-break')) {
       setViewType('long-break');
+      const duration = params.get('duration');
+      if (duration) setBreakDuration(parseInt(duration, 10));
     } else if (params.has('break')) {
       setViewType('break');
+      const duration = params.get('duration');
+      if (duration) setBreakDuration(parseInt(duration, 10));
     } else {
       // Default to dashboard
       setViewType('dashboard');
@@ -54,7 +59,7 @@ function ViewManager() {
   }
 
   if (viewType === 'break' || viewType === 'long-break') {
-    return <Break isLongBreak={viewType === 'long-break'} />;
+    return <Break isLongBreak={viewType === 'long-break'} initialDuration={breakDuration} />;
   }
 
   // Loading state
