@@ -31,14 +31,7 @@ import { PreBreakSettings } from './preBreakSettings';
 import { LongBreakSettings } from './longBreakSettings';
 import { ChimeSettings } from './chimeSettings';
 import { track } from './lib/analytics';
-
-const APP_VERSION = '1.0.0';
-const LANDING_URL = 'https://afk-app.vercel.app';
-// Authors
-const CHAITANYA_TWITTER = 'https://x.com/holaChaitanya';
-const CHAITANYA_GITHUB = 'https://github.com/holaChaitanya';
-const HARRY_TWITTER = 'https://x.com/Harry_kp_';
-const HARRY_GITHUB = 'https://github.com/Harry-kp';
+import { AUTHORS, APP_INFO } from './constants/authors';
 
 function ConfigPathSettings() {
   const [configPath, setConfigPath] = useState<string | null>(null);
@@ -196,9 +189,9 @@ function Settings({
             <TabsContent value="about">
               <div className="pt-8 text-center">
                 {/* App Logo & Name */}
-                <h1 className="text-3xl font-bold text-white mb-2">AFK</h1>
-                <p className="text-neutral-400 mb-1">Version {APP_VERSION}</p>
-                <p className="text-neutral-500 text-sm mb-8">Step away from your keyboard</p>
+                <h1 className="text-3xl font-bold text-white mb-2">{APP_INFO.name}</h1>
+                <p className="text-neutral-400 mb-1">Version {APP_INFO.version}</p>
+                <p className="text-neutral-500 text-sm mb-8">{APP_INFO.tagline}</p>
                 
                 {/* Tagline */}
                 <div className="bg-neutral-800/50 rounded-lg p-6 mb-8 max-w-md mx-auto">
@@ -217,7 +210,7 @@ function Settings({
                       onClick={() => {
                         track('share_twitter');
                         window.open(
-                          `https://twitter.com/intent/tweet?text=${encodeURIComponent('👀 Taking better care of my eyes with AFK - a beautiful break reminder app for developers. Check it out!')}&url=${encodeURIComponent(LANDING_URL)}`,
+                          `https://twitter.com/intent/tweet?text=${encodeURIComponent('👀 Taking better care of my eyes with AFK - a beautiful break reminder app for developers. Check it out!')}&url=${encodeURIComponent(APP_INFO.website)}`,
                           '_blank'
                         );
                       }}
@@ -230,7 +223,7 @@ function Settings({
                       size="sm"
                       onClick={() => {
                         track('share_copy_link');
-                        navigator.clipboard.writeText(LANDING_URL);
+                        navigator.clipboard.writeText(APP_INFO.website);
                       }}
                     >
                       <Share2 className="w-4 h-4 mr-2" />
@@ -244,7 +237,7 @@ function Settings({
                 {/* Links */}
                 <div className="flex justify-center gap-6 mb-8">
                   <a
-                    href={LANDING_URL}
+                    href={APP_INFO.website}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-neutral-400 hover:text-white transition-colors flex items-center gap-2"
@@ -255,25 +248,25 @@ function Settings({
                     <ExternalLink className="w-3 h-3" />
                   </a>
                   <a
-                    href={CHAITANYA_TWITTER}
+                    href={AUTHORS.chaitanya.twitter}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-neutral-400 hover:text-white transition-colors flex items-center gap-2"
                     onClick={() => track('link_twitter_chaitanya')}
                   >
                     <Twitter className="w-4 h-4" />
-                    @holaChaitanya
+                    {AUTHORS.chaitanya.twitterHandle}
                     <ExternalLink className="w-3 h-3" />
                   </a>
                   <a
-                    href={HARRY_TWITTER}
+                    href={AUTHORS.harry.twitter}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-neutral-400 hover:text-white transition-colors flex items-center gap-2"
                     onClick={() => track('link_twitter_harry')}
                   >
                     <Twitter className="w-4 h-4" />
-                    @Harry_kp_
+                    {AUTHORS.harry.twitterHandle}
                     <ExternalLink className="w-3 h-3" />
                   </a>
                 </div>
@@ -282,25 +275,25 @@ function Settings({
                 <div className="text-neutral-500 text-sm flex items-center justify-center gap-1 flex-wrap">
                   Made with <Heart className="w-4 h-4 text-red-500 fill-red-500" /> by
                   <a
-                    href={CHAITANYA_GITHUB}
+                    href={AUTHORS.chaitanya.github}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-neutral-400 hover:text-white transition-colors"
                   >
-                    Chaitanya
+                    {AUTHORS.chaitanya.displayName}
                   </a>
                   &
                   <a
-                    href={HARRY_GITHUB}
+                    href={AUTHORS.harry.github}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-neutral-400 hover:text-white transition-colors"
                   >
-                    Harry
+                    {AUTHORS.harry.displayName}
                   </a>
                 </div>
                 <p className="text-neutral-600 text-xs mt-2">
-                  © 2024-2026 All rights reserved
+                  {APP_INFO.copyright}
                 </p>
               </div>
             </TabsContent>
