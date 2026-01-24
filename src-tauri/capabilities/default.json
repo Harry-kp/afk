@@ -20,7 +20,8 @@
     "autostart:allow-enable",
     "autostart:allow-disable",
     "autostart:allow-is-enabled",
-    "store:default"
+    "store:default",
+    "opener:default"
   ]
 }
 

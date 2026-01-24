@@ -61,5 +61,9 @@
       }
     }
   },
-  "plugins": {}
+  "plugins": {
+    "opener": {
+      "open": true
+    }
+  }
 }
