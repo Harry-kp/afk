@@ -92,36 +92,25 @@ function DataSettings() {
         <Label className="flex flex-col space-y-1">
           <span>Reset settings</span>
           <span className="font-normal leading-snug text-muted-foreground text-xs">
-            Restore all settings to defaults
+            {showConfirm ? 'Click again to confirm' : 'Restore all to defaults'}
           </span>
         </Label>
-        {showConfirm ? (
-          <div className="flex gap-2">
-            <Button
-              variant="destructive"
-              size="sm"
-              onClick={handleReset}
-            >
-              Confirm Reset
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setShowConfirm(false)}
-            >
-              Cancel
-            </Button>
-          </div>
-        ) : (
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setShowConfirm(true)}
-          >
-            <RotateCcw className="w-4 h-4 mr-2" />
-            Reset to Defaults
-          </Button>
-        )}
+        <button
+          type="button"
+          onClick={() => {
+            if (showConfirm) {
+              handleReset();
+            } else {
+              setShowConfirm(true);
+              // Auto-cancel after 3 seconds
+              setTimeout(() => setShowConfirm(false), 3000);
+            }
+          }}
+          className="p-2 hover:bg-muted rounded-md transition-colors"
+          title={showConfirm ? 'Click to confirm reset' : 'Reset to defaults'}
+        >
+          <RotateCcw className={`w-4 h-4 ${showConfirm ? 'text-yellow-500' : 'text-muted-foreground'}`} />
+        </button>
       </div>
     </div>
   );
