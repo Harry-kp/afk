@@ -1,6 +1,6 @@
 use crate::commands::{self, show_settings_window};
 use crate::state::AppState;
-use crate::utils::get_readable_time;
+use crate::utils::get_tray_time;
 use tauri::{
     menu::{MenuBuilder, MenuItemBuilder, PredefinedMenuItem, SubmenuBuilder},
     tray::{TrayIconBuilder, TrayIconEvent},
@@ -224,15 +224,15 @@ pub fn update_tray_title<R: Runtime>(app: &AppHandle<R>, remaining_secs: i64) {
             if let Some(start_time) = &session.start_time {
                 if let Ok(start) = chrono::DateTime::parse_from_rfc3339(start_time) {
                     let elapsed = (chrono::Utc::now() - start.with_timezone(&chrono::Utc)).num_seconds();
-                    format!("{} elapsed", get_readable_time(elapsed))
+                    format!("{} elapsed", get_tray_time(elapsed))
                 } else {
-                    format!("{} left", get_readable_time(remaining_secs))
+                    format!("{} left", get_tray_time(remaining_secs))
                 }
             } else {
-                format!("{} left", get_readable_time(remaining_secs))
+                format!("{} left", get_tray_time(remaining_secs))
             }
         } else {
-            format!("{} left", get_readable_time(remaining_secs))
+            format!("{} left", get_tray_time(remaining_secs))
         };
         
         let _ = tray.set_title(Some(&time_string));

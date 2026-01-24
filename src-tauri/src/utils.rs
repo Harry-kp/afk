@@ -27,31 +27,21 @@ impl ChimeEvent {
     }
 }
 
-/// Format duration in seconds to a readable string (e.g., "25m00s")
-pub fn get_readable_time(duration_in_seconds: i64) -> String {
+/// Format duration for tray display (compact: "24m" or "45s")
+/// Shows minutes if >= 1 minute, seconds only when < 1 minute
+pub fn get_tray_time(duration_in_seconds: i64) -> String {
     if duration_in_seconds < 0 {
         return "0s".to_string();
     }
     
-    let hours = duration_in_seconds / 3600;
-    let minutes = (duration_in_seconds % 3600) / 60;
+    let minutes = duration_in_seconds / 60;
     let seconds = duration_in_seconds % 60;
     
-    let mut result = String::new();
-    
-    if hours > 0 {
-        result.push_str(&format!("{:02}h", hours));
+    if minutes >= 1 {
+        format!("{}m", minutes)
+    } else {
+        format!("{}s", seconds)
     }
-    
-    if minutes > 0 {
-        result.push_str(&format!("{:02}m", minutes));
-    }
-    
-    if seconds > 0 || result.is_empty() {
-        result.push_str(&format!("{:02}s", seconds));
-    }
-    
-    result
 }
 
 /// Parse an ISO 8601 date string to DateTime<Utc>
