@@ -3,7 +3,8 @@
 // Keep in sync with: src/renderer/constants/authors.ts
 // =============================================================================
 
-const AUTHORS = {
+// Make constants global for data attribute lookup
+window.AUTHORS = {
   chaitanya: {
     name: 'Chaitanya Aaditya',
     displayName: 'Chaitanya',
@@ -22,7 +23,7 @@ const AUTHORS = {
   },
 };
 
-const APP_INFO = {
+window.APP_INFO = {
   name: 'AFK',
   version: '1.0.0',
   tagline: 'Step away from your keyboard',
