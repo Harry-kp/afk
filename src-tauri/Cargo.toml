@@ -2,7 +2,7 @@
 name = "afk"
 version = "1.0.0"
 description = "AFK - Step away from your keyboard with mindful break reminders"
-authors = ["Harry-kp <chaudharyharshit9@gmail.com>"]
+authors = ["Chaitanya Aaditya <ca.chaitanya.2204@gmail.com>", "Harry-kp <chaudharyharshit9@gmail.com>"]
 edition = "2021"
 license = "MIT"
 
