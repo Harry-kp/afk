@@ -6,6 +6,8 @@ use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::sync::Arc;
 use tauri::{AppHandle, Manager, Runtime, State, WebviewUrl, WebviewWindowBuilder};
+
+// Note: WebviewUrl and WebviewWindowBuilder still needed for break windows
 use tauri_plugin_notification::NotificationExt;
 
 /// Session state for frontend
@@ -452,13 +454,10 @@ pub async fn create_break_windows<R: Runtime>(app: &AppHandle<R>) {
     }
 }
 
-/// Show the settings/dashboard window
-pub fn show_settings_window<R: Runtime>(app: &AppHandle<R>, open_dashboard: bool) {
-    // Use "main" window for dashboard, create "settings" only if needed
-    let label = if open_dashboard { "main" } else { "settings" };
-    
-    // Check if window already exists
-    if let Some(window) = app.get_webview_window(label) {
+/// Show the main window (always use single window)
+pub fn show_settings_window<R: Runtime>(app: &AppHandle<R>, _open_dashboard: bool) {
+    // Always use the "main" window - single window UX
+    if let Some(window) = app.get_webview_window("main") {
         // Show dock icon on macOS
         #[cfg(target_os = "macos")]
         {
@@ -467,30 +466,5 @@ pub fn show_settings_window<R: Runtime>(app: &AppHandle<R>, open_dashboard: bool
         
         let _ = window.show();
         let _ = window.set_focus();
-        return;
-    }
-    
-    // For settings, we might need to create a new window
-    if !open_dashboard {
-        let url = "index.html?settings";
-        let window = WebviewWindowBuilder::new(
-            app,
-            "settings",
-            WebviewUrl::App(url.into()),
-        )
-        .title("Settings")
-        .inner_size(1024.0, 728.0)
-        .resizable(false)
-        .center();
-        
-        if let Ok(window) = window.build() {
-            // Show dock icon on macOS
-            #[cfg(target_os = "macos")]
-            {
-                let _ = app.set_activation_policy(tauri::ActivationPolicy::Regular);
-            }
-            
-            let _ = window.show();
-        }
     }
 }

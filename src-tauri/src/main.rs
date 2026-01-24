@@ -8,10 +8,10 @@ mod tray;
 mod utils;
 
 use state::AppState;
-use tauri::Manager;
+use tauri::{Manager, RunEvent};
 
 fn main() {
-    tauri::Builder::default()
+    let app = tauri::Builder::default()
         .plugin(tauri_plugin_store::Builder::new().build())
         .plugin(tauri_plugin_notification::init())
         .plugin(tauri_plugin_autostart::init(
@@ -55,8 +55,8 @@ fn main() {
         .on_window_event(|window, event| {
             if let tauri::WindowEvent::CloseRequested { api, .. } = event {
                 let label = window.label();
-                if label == "main" || label == "settings" || label == "dashboard" {
-                    // Hide dock icon on macOS when settings window is closed
+                if label == "main" {
+                    // Hide dock icon on macOS when main window is closed
                     #[cfg(target_os = "macos")]
                     {
                         let app = window.app_handle();
@@ -67,7 +67,15 @@ fn main() {
                 }
             }
         })
-        .run(tauri::generate_context!())
-        .expect("error while running tauri application");
+        .build(tauri::generate_context!())
+        .expect("error while building tauri application");
+
+    app.run(|app_handle, event| {
+        // Handle dock icon click on macOS (reopen event)
+        #[cfg(target_os = "macos")]
+        if let RunEvent::Reopen { .. } = event {
+            commands::show_settings_window(app_handle, true);
+        }
+    });
 }
 
