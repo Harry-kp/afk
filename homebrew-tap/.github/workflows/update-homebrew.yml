@@ -1,0 +1,73 @@
+# .github/workflows/update-homebrew.yml
+name: Update Homebrew Cask
+
+on:
+  workflow_dispatch: # Triggered by afk repo after release
+
+jobs:
+  update-cask:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout tap repository
+        uses: actions/checkout@v4
+
+      - name: Fetch latest release from afk-releases
+        id: get_release
+        run: |
+          # Get latest release info from public releases repo
+          RELEASE_DATA=$(curl -s https://api.github.com/repos/Harry-kp/afk-releases/releases/latest)
+          
+          VERSION=$(echo "$RELEASE_DATA" | jq -r '.tag_name | sub("^v"; "")')
+          DMG_URL=$(echo "$RELEASE_DATA" | jq -r '.assets[] | select(.name | endswith(".dmg")) | .browser_download_url')
+          
+          echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+          echo "DMG_URL=$DMG_URL" >> $GITHUB_OUTPUT
+          
+          echo "Found version: $VERSION"
+          echo "DMG URL: $DMG_URL"
+
+      - name: Calculate SHA256
+        id: sha256
+        run: |
+          DMG_URL="${{ steps.get_release.outputs.DMG_URL }}"
+          SHA256=$(curl -L -s "$DMG_URL" | shasum -a 256 | awk '{print $1}')
+          echo "SHA256=$SHA256" >> $GITHUB_OUTPUT
+          echo "SHA256: $SHA256"
+
+      - name: Update Cask file
+        run: |
+          VERSION="${{ steps.get_release.outputs.VERSION }}"
+          SHA256="${{ steps.sha256.outputs.SHA256 }}"
+          DMG_URL="${{ steps.get_release.outputs.DMG_URL }}"
+          
+          # Update version
+          sed -i "s/version \".*\"/version \"$VERSION\"/" Casks/afk.rb
+          
+          # Update sha256
+          sed -i "s/sha256 \".*\"/sha256 \"$SHA256\"/" Casks/afk.rb
+          
+          # Update URL (escape slashes for sed)
+          ESCAPED_URL=$(echo "$DMG_URL" | sed 's/[&/\]/\\&/g')
+          sed -i "s|url \".*\"|url \"$DMG_URL\"|" Casks/afk.rb
+          
+          echo "Updated Casks/afk.rb:"
+          cat Casks/afk.rb
+
+      - name: Commit and push changes
+        run: |
+          VERSION="${{ steps.get_release.outputs.VERSION }}"
+          
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          
+          git add Casks/afk.rb
+          
+          # Check if there are changes
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "chore(afk): update to v$VERSION"
+            git push
+            echo "✅ Cask updated to v$VERSION"
+          fi
+
