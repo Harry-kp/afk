@@ -16,7 +16,7 @@ import {
   Copy,
   Check,
   RotateCcw,
-  Settings2,
+  FileJson,
 } from 'lucide-react';
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './components/ui/tabs';
@@ -37,20 +37,13 @@ const LANDING_URL = 'https://afk-app.vercel.app';
 const TWITTER_URL = 'https://twitter.com/Harry_kp_';
 const GITHUB_URL = 'https://github.com/Harry-kp';
 
-function DataSettings() {
+function ConfigPathSettings() {
   const [configPath, setConfigPath] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     window.electron.app.getConfigPath().then(setConfigPath);
   }, []);
-
-  const handleReset = async () => {
-    await window.electron.app.resetSettings();
-    track('settings_reset');
-    // Reload the page to reflect changes
-    window.location.reload();
-  };
 
   const copyConfigPath = () => {
     if (configPath) {
@@ -62,47 +55,53 @@ function DataSettings() {
   };
 
   return (
-    <div className="grid gap-4">
-      {/* Config Path */}
-      <div className="flex items-center justify-between space-x-2">
-        <Label className="flex flex-col space-y-1">
-          <span>Config location</span>
-          <span className="font-normal leading-snug text-muted-foreground text-xs font-mono truncate max-w-[300px]">
-            {configPath || 'Loading...'}
-          </span>
-        </Label>
-        <button
-          type="button"
-          onClick={copyConfigPath}
-          disabled={!configPath}
-          className="p-2 hover:bg-muted rounded-md transition-colors disabled:opacity-50"
-          title="Copy path"
-        >
-          {copied ? (
-            <Check className="w-4 h-4 text-yellow-500" />
-          ) : (
-            <Copy className="w-4 h-4 text-muted-foreground" />
-          )}
-        </button>
-      </div>
+    <div className="flex items-center justify-between space-x-2 w-full">
+      <Label className="flex flex-col space-y-1">
+        <span>Config location</span>
+        <span className="font-normal leading-snug text-muted-foreground text-xs font-mono truncate max-w-[300px]">
+          {configPath || 'Loading...'}
+        </span>
+      </Label>
+      <button
+        type="button"
+        onClick={copyConfigPath}
+        disabled={!configPath}
+        className="p-2 hover:bg-muted rounded-md transition-colors disabled:opacity-50"
+        title="Copy path"
+      >
+        {copied ? (
+          <Check className="w-4 h-4 text-yellow-500" />
+        ) : (
+          <Copy className="w-4 h-4 text-muted-foreground" />
+        )}
+      </button>
+    </div>
+  );
+}
 
-      {/* Reset to Defaults - double click with visual feedback */}
-      <div className="flex items-center justify-between space-x-2">
-        <Label className="flex flex-col space-y-1">
-          <span>Reset settings</span>
-          <span className="font-normal leading-snug text-muted-foreground text-xs">
-            Double-click to reset
-          </span>
-        </Label>
-        <button
-          type="button"
-          onDoubleClick={handleReset}
-          className="p-2 hover:bg-muted rounded-md transition-all group"
-          title="Double-click to reset"
-        >
-          <RotateCcw className="w-4 h-4 text-muted-foreground group-hover:text-yellow-500 group-active:text-red-500 group-active:rotate-180 transition-all duration-300" />
-        </button>
-      </div>
+function ResetSettings() {
+  const handleReset = async () => {
+    await window.electron.app.resetSettings();
+    track('settings_reset');
+    window.location.reload();
+  };
+
+  return (
+    <div className="flex items-center justify-between space-x-2 w-full">
+      <Label className="flex flex-col space-y-1">
+        <span>Reset settings</span>
+        <span className="font-normal leading-snug text-muted-foreground text-xs">
+          Double-click to reset
+        </span>
+      </Label>
+      <button
+        type="button"
+        onDoubleClick={handleReset}
+        className="p-2 hover:bg-muted rounded-md transition-all group"
+        title="Double-click to reset"
+      >
+        <RotateCcw className="w-4 h-4 text-muted-foreground group-hover:text-yellow-500 group-active:text-red-500 group-active:rotate-180 transition-all duration-300" />
+      </button>
     </div>
   );
 }
@@ -179,9 +178,16 @@ function Settings({
               <div className="pt-4" />
               <Separator className="my-4" />
               <div className="pt-4" />
-              <div className="flex items-start gap-x-8 [&>div]:w-full">
-                <Settings2 width={20} height={20} className="mt-1" />
-                <DataSettings />
+              <div className="flex items-center gap-x-8 [&>div]:w-full">
+                <FileJson width={20} height={20} />
+                <ConfigPathSettings />
+              </div>
+              <div className="pt-4" />
+              <Separator className="my-4" />
+              <div className="pt-4" />
+              <div className="flex items-center gap-x-8 [&>div]:w-full">
+                <RotateCcw width={20} height={20} />
+                <ResetSettings />
               </div>
             </TabsContent>
             <TabsContent value="about">
