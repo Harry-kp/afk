@@ -1,126 +1,126 @@
 # AFK
 
-**AFK** (Away From Keyboard) is a desktop application designed to help users maintain a healthy work-life balance by reminding them to take regular breaks during their work sessions. Built with Tauri for a lightweight, fast, and native experience.
+[![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](https://github.com/Harry-kp/afk/releases)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![Platform](https://img.shields.io/badge/platform-macOS%20%7C%20Windows%20%7C%20Linux-lightgrey.svg)](https://github.com/Harry-kp/afk)
 
-## Quick Install (macOS)
+A lightweight desktop application that helps you maintain focus and prevent burnout with intelligent break reminders. Built with Tauri for native performance and minimal resource usage.
+
+## Quick Start
+
+### macOS (Homebrew)
 
 ```bash
 brew tap Harry-kp/tap
 brew install --cask afk
 ```
 
-## Features
+### Other Platforms
 
-- Customizable work session durations
-- Automatic break reminders with fullscreen overlay
-- Configurable short and long break durations
-- Long break support after multiple work sessions
-- System tray timer display with remaining/elapsed time
-- Dashboard for session tracking
-- Pause and resume session functionality
-- Option to skip breaks or take them early
-- Pre-break notifications with optional chime sounds
-- Configurable chime sounds for different events
-- Launch at login capability
-- Cross-platform support (macOS, Windows, Linux)
+Download the latest release for your platform from the [releases page](https://github.com/Harry-kp/afk/releases).
 
-## Installation
+## Key Features
 
-### Prerequisites
+- **Customizable Work Sessions** - Set focus durations that match your workflow
+- **Smart Break Management** - Automated short and long break scheduling
+- **Fullscreen Break Reminders** - Impossible to ignore when it's time to rest
+- **System Tray Integration** - Monitor time remaining without switching windows
+- **Session Tracking** - Built-in dashboard to review your productivity patterns
+- **Flexible Controls** - Pause, skip, or start breaks early as needed
+- **Audio Notifications** - Configurable chimes for session transitions
+- **Launch at Login** - Seamless integration into your daily routine
+- **Cross-Platform** - Works on macOS, Windows, and Linux
 
-- [Node.js](https://nodejs.org/) (v18 or higher)
-- [Rust](https://www.rust-lang.org/tools/install) (latest stable)
-- Platform-specific dependencies for Tauri:
+## Why AFK?
+
+Extended screen time without breaks leads to eye strain, decreased productivity, and burnout. AFK helps you build sustainable work habits by enforcing regular breaks based on proven time management techniques like the Pomodoro method. The application runs natively on your system with minimal resource usage, ensuring your break reminders don't become another source of slowdown.
+
+## Configuration
+
+Customize the application to match your preferred work style:
+
+- **Focus Duration** - Length of work sessions (default: 25 minutes)
+- **Short Break** - Duration of regular breaks (default: 30 seconds)
+- **Long Break** - Duration of extended breaks (default: 2 minutes)
+- **Sessions Before Long Break** - Cycles before triggering a long break
+- **Pre-break Notifications** - Get advance warning before breaks start
+- **Audio Alerts** - Enable sound notifications for session transitions
+- **Launch at Login** - Automatically start with your system
+
+All settings are accessible through the in-app Settings panel and persist between sessions.
+
+## Development Setup
+
+### Requirements
+
+- Node.js 18 or higher
+- Rust (latest stable version)
+- Platform-specific dependencies:
   - **macOS**: Xcode Command Line Tools
   - **Windows**: Microsoft Visual Studio C++ Build Tools
   - **Linux**: `build-essential`, `libwebkit2gtk-4.1-dev`, `libssl-dev`, `libgtk-3-dev`, `libayatana-appindicator3-dev`, `librsvg2-dev`
 
-### Development
-
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/Harry-kp/afk.git
-   cd afk
-   ```
-
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
-
-3. Start the application in development mode:
-   ```bash
-   npm run dev
-   ```
-
-### Building for Production
+### Build from Source
 
 ```bash
+# Clone the repository
+git clone https://github.com/Harry-kp/afk.git
+cd afk
+
+# Install dependencies
+npm install
+
+# Run in development mode
+npm run dev
+
+# Build for production
 npm run build
 ```
 
-The built application will be available in `src-tauri/target/release/bundle/`.
+The production build will be available in `src-tauri/target/release/bundle/`.
 
-## Technology Stack
+## Technical Architecture
 
-- **Backend**: [Tauri](https://tauri.app/) + Rust
-- **Frontend**: React + TypeScript
+Built with modern technologies for optimal performance and developer experience:
+
+- **Backend**: Tauri 2.0 + Rust
+- **Frontend**: React 18 + TypeScript
 - **Build Tool**: Vite
-- **Styling**: Tailwind CSS + Radix UI
+- **UI Framework**: Tailwind CSS + Radix UI
 - **Animations**: Framer Motion
 
-## Project Structure
+### Project Structure
 
 ```
-afk/
+src/                    # React application
+├── components/         # Reusable UI components
+├── lib/               # Utilities and Tauri IPC bridge
+└── *.tsx              # Application pages
+
+src-tauri/             # Rust backend
 ├── src/
-│   └── renderer/          # React frontend
-│       ├── components/    # UI components
-│       ├── lib/           # Utilities and Tauri bridge
-│       └── *.tsx          # Page components
-├── src-tauri/
-│   ├── src/               # Rust backend
-│   │   ├── main.rs        # Application entry point
-│   │   ├── commands.rs    # IPC command handlers
-│   │   ├── state.rs       # Session/settings state
-│   │   ├── tray.rs        # System tray
-│   │   └── utils.rs       # Utilities
-│   ├── icons/             # Application icons
-│   ├── resources/         # Audio files
-│   └── tauri.conf.json    # Tauri configuration
-├── index.html             # HTML entry point
-├── vite.config.ts         # Vite configuration
-└── package.json
+│   ├── main.rs        # Application entry
+│   ├── commands.rs    # IPC handlers
+│   ├── state.rs       # Session management
+│   ├── tray.rs        # System tray integration
+│   └── utils.rs       # Helper functions
+├── icons/             # App icons
+├── resources/         # Audio assets
+└── tauri.conf.json    # Tauri configuration
 ```
-
-## Configuration
-
-The application stores settings using Tauri's store plugin. Settings can be configured through the in-app Settings panel:
-
-- **Focus Duration**: Work session length (default: 25 minutes)
-- **Short Break**: Short break duration (default: 30 seconds)
-- **Long Break**: Long break duration (default: 2 minutes)
-- **Sessions Before Long Break**: Number of sessions before a long break
-- **Pre-break Notification**: Warning before break starts
-- **Chime Sounds**: Audio notifications for session events
-- **Launch at Login**: Start app automatically on system boot
 
 ## Contributing
 
-Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+Contributions are welcome. Please read [CONTRIBUTING.md](CONTRIBUTING.md) for development guidelines and coding standards.
 
 ## License
 
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+MIT License - see [LICENSE](LICENSE) for details.
 
 ## Author
 
-Harry-kp
-- GitHub: [@Harry-kp](https://github.com/Harry-kp)
-- Email: chaudharyharshit9@gmail.com
+Created by [Harry-kp](https://github.com/Harry-kp)
 
-## Acknowledgments
+---
 
-- Built with [Tauri](https://tauri.app/)
-- UI components from [Radix UI](https://www.radix-ui.com/)
-- Icons from [Lucide](https://lucide.dev/)
+**Built with** [Tauri](https://tauri.app/) • **UI Components** [Radix UI](https://www.radix-ui.com/) • **Icons** [Lucide](https://lucide.dev/)
