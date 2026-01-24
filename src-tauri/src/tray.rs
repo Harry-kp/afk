@@ -3,7 +3,7 @@ use crate::state::AppState;
 use crate::utils::get_tray_time;
 use tauri::{
     menu::{MenuBuilder, MenuItemBuilder, PredefinedMenuItem, SubmenuBuilder},
-    tray::{TrayIconBuilder, TrayIconEvent},
+    tray::TrayIconBuilder,
     AppHandle, Manager, Runtime,
 };
 
@@ -16,20 +16,14 @@ pub fn create_tray<R: Runtime>(app: &tauri::App<R>) -> Result<(), Box<dyn std::e
     // Build the tray menu
     let menu = build_tray_menu(handle, false, false)?;
     
-    // Create tray with emoji title only - no icon needed
+    // Create tray with emoji title only - clicking shows menu (default behavior)
     let _tray = TrayIconBuilder::with_id(TRAY_ID)
         .title("👀")
         .menu(&menu)
-        .tooltip("Afk")
+        .show_menu_on_left_click(true) // Show menu on left click instead of custom action
+        .tooltip("AFK")
         .on_menu_event(move |app, event| {
             handle_menu_event(app, event.id.as_ref());
-        })
-        .on_tray_icon_event(|tray, event| {
-            if let TrayIconEvent::Click { .. } = event {
-                // On click, show the dashboard
-                let app = tray.app_handle();
-                show_settings_window(app, true);
-            }
         })
         .build(app)?;
     
