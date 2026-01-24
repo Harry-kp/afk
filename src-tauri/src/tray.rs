@@ -1,4 +1,4 @@
-use crate::commands::{self, show_settings_window};
+use crate::commands;
 use crate::state::AppState;
 use crate::utils::get_tray_time;
 use tauri::{
@@ -13,8 +13,8 @@ const TRAY_ID: &str = "main-tray";
 pub fn create_tray<R: Runtime>(app: &tauri::App<R>) -> Result<(), Box<dyn std::error::Error>> {
     let handle = app.handle();
     
-    // Build the tray menu
-    let menu = build_tray_menu(handle, false, false)?;
+    // Build the tray menu (initial state: idle)
+    let menu = build_tray_menu(handle, false, false, false)?;
     
     // Create tray with emoji title only - clicking shows menu (default behavior)
     let _tray = TrayIconBuilder::with_id(TRAY_ID)
@@ -30,16 +30,40 @@ pub fn create_tray<R: Runtime>(app: &tauri::App<R>) -> Result<(), Box<dyn std::e
     Ok(())
 }
 
-/// Build the tray menu
+/// Build the tray menu based on app state
 fn build_tray_menu<R: Runtime>(
     app: &AppHandle<R>,
     session_active: bool,
     session_paused: bool,
+    is_on_break: bool,
 ) -> Result<tauri::menu::Menu<R>, Box<dyn std::error::Error>> {
     let menu = MenuBuilder::new(app);
     
+    // ON BREAK: Show break-specific options only
+    if is_on_break {
+        let skip_item = MenuItemBuilder::with_id("skip_break", "Skip this break").build(app)?;
+        let menu = menu.item(&skip_item);
+        
+        let snooze_item = MenuItemBuilder::with_id("snooze_break", "Snooze (5 minutes)").build(app)?;
+        let menu = menu.item(&snooze_item);
+        
+        let separator = PredefinedMenuItem::separator(app)?;
+        let menu = menu.item(&separator);
+        
+        let end_session = MenuItemBuilder::with_id("end_session", "End session").build(app)?;
+        let menu = menu.item(&end_session);
+        
+        let separator2 = PredefinedMenuItem::separator(app)?;
+        let menu = menu.item(&separator2);
+        
+        let quit = MenuItemBuilder::with_id("quit", "Quit").build(app)?;
+        let menu = menu.item(&quit);
+        
+        return Ok(menu.build()?);
+    }
+    
+    // IDLE: No session active
     if !session_active && !session_paused {
-        // Show "Start session" when no session is active
         let start_item = MenuItemBuilder::with_id("start_session", "Start session").build(app)?;
         let menu = menu.item(&start_item);
         
@@ -64,8 +88,8 @@ fn build_tray_menu<R: Runtime>(
         return Ok(menu.build()?);
     }
     
+    // PAUSED: Session is paused
     if session_paused {
-        // Show "Resume session" when paused
         let resume_item = MenuItemBuilder::with_id("resume_session", "Resume session").build(app)?;
         let menu = menu.item(&resume_item);
         
@@ -96,7 +120,7 @@ fn build_tray_menu<R: Runtime>(
         return Ok(menu.build()?);
     }
     
-    // Session is active - show submenu with options
+    // SESSION ACTIVE: Working, waiting for break
     let break_submenu = SubmenuBuilder::with_id(app, "break_menu", "Your break begins in ...")
         .item(&MenuItemBuilder::with_id("take_break_now", "Start this break now").build(app)?)
         .separator()
@@ -171,6 +195,11 @@ fn handle_menu_event<R: Runtime>(app: &AppHandle<R>, id: &str) {
                 let _ = commands::skip_break(app_clone).await;
             });
         }
+        "snooze_break" => {
+            tauri::async_runtime::spawn(async move {
+                let _ = commands::snooze_break(app_clone).await;
+            });
+        }
         "add_1_min" => {
             tauri::async_runtime::spawn(async move {
                 let _ = commands::add_time(app_clone, 60).await;
@@ -182,15 +211,16 @@ fn handle_menu_event<R: Runtime>(app: &AppHandle<R>, id: &str) {
             });
         }
         "dashboard" => {
-            show_settings_window(app, true);
+            commands::show_settings_window(app, true);
         }
         "settings" => {
-            show_settings_window(app, false);
+            commands::show_settings_window(app, false);
         }
         "quit" => {
-            // Reset session before quitting
+            // Reset session and clear break state before quitting
             let state = app.state::<AppState>();
             state.reset_session();
+            state.set_on_break(false);
             app.exit(0);
         }
         _ => {}
@@ -198,9 +228,14 @@ fn handle_menu_event<R: Runtime>(app: &AppHandle<R>, id: &str) {
 }
 
 /// Update the tray menu based on session state
-pub fn update_tray_menu<R: Runtime>(app: &AppHandle<R>, session_active: bool, session_paused: bool) {
+pub fn update_tray_menu<R: Runtime>(
+    app: &AppHandle<R>, 
+    session_active: bool, 
+    session_paused: bool,
+    is_on_break: bool,
+) {
     if let Some(tray) = app.tray_by_id(TRAY_ID) {
-        if let Ok(menu) = build_tray_menu(app, session_active, session_paused) {
+        if let Ok(menu) = build_tray_menu(app, session_active, session_paused, is_on_break) {
             let _ = tray.set_menu(Some(menu));
         }
     }

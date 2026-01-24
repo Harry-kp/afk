@@ -40,6 +40,8 @@ pub struct AppState {
     pub settings: Mutex<HashMap<String, serde_json::Value>>,
     /// Short break count for long break calculation
     pub short_break_count: Mutex<u64>,
+    /// Flag to track if user is currently on a break
+    pub on_break: Mutex<bool>,
 }
 
 impl AppState {
@@ -73,6 +75,7 @@ impl AppState {
             timer_cancelled: Arc::new(Mutex::new(false)),
             settings: Mutex::new(settings),
             short_break_count: Mutex::new(0),
+            on_break: Mutex::new(false),
         }
     }
     
@@ -167,6 +170,16 @@ impl AppState {
     /// Reset timer cancellation flag
     pub fn reset_timer_cancelled(&self) {
         *self.timer_cancelled.lock() = false;
+    }
+    
+    /// Check if user is currently on a break
+    pub fn is_on_break(&self) -> bool {
+        *self.on_break.lock()
+    }
+    
+    /// Set the on-break state
+    pub fn set_on_break(&self, value: bool) {
+        *self.on_break.lock() = value;
     }
 }
 

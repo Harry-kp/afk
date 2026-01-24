@@ -167,6 +167,11 @@ pub async fn start_session_internal<R: Runtime>(
 ) {
     let state = app.state::<AppState>();
     
+    // Close break windows if on break (prevents multiple states)
+    if state.is_on_break() {
+        close_break_windows_internal(app);
+    }
+    
     // Cancel any existing timer
     state.cancel_timer();
     state.reset_timer_cancelled();
@@ -208,8 +213,8 @@ pub async fn start_session_internal<R: Runtime>(
         }
     });
     
-    // Update tray
-    tray::update_tray_menu(app, true, false);
+    // Update tray (session active, not paused, not on break)
+    tray::update_tray_menu(app, true, false, false);
     
     // Start the timer task
     let app_handle = app.clone();
@@ -261,10 +266,7 @@ pub async fn start_session_internal<R: Runtime>(
                 
                 // Check if break time
                 if remaining_secs <= 0 {
-                    // Time for a break!
-                    tray::update_tray_menu(&app_handle, false, false);
-                    tray::clear_tray_title(&app_handle);
-                    
+                    // Time for a break! (create_break_windows will set the proper tray state)
                     play_chime_for_event(&app_handle, ChimeEvent::BreakStart);
                     create_break_windows(&app_handle).await;
                     break;
@@ -297,8 +299,8 @@ pub async fn pause_session<R: Runtime>(app: AppHandle<R>) -> Result<(), String> 
         });
     }
     
-    // Update tray
-    tray::update_tray_menu(&app, false, true);
+    // Update tray (not active, paused, not on break)
+    tray::update_tray_menu(&app, false, true, false);
     tray::set_tray_title(&app, "Session paused");
     
     Ok(())
@@ -309,14 +311,20 @@ pub async fn pause_session<R: Runtime>(app: AppHandle<R>) -> Result<(), String> 
 pub async fn end_session<R: Runtime>(app: AppHandle<R>) -> Result<(), String> {
     let state = app.state::<AppState>();
     
+    // Close break windows if on break
+    if state.is_on_break() {
+        close_break_windows_internal(&app);
+    }
+    
     // Cancel the timer
     state.cancel_timer();
     
-    // Reset session
+    // Reset session and break state
     state.reset_session();
+    state.set_on_break(false);
     
     // Update tray
-    tray::update_tray_menu(&app, false, false);
+    tray::update_tray_menu(&app, false, false, false);
     tray::clear_tray_title(&app);
     
     Ok(())
@@ -370,11 +378,8 @@ pub async fn take_break_now<R: Runtime>(app: AppHandle<R>) -> Result<(), String>
     // Cancel the timer
     state.cancel_timer();
     
-    // Update tray
-    tray::update_tray_menu(&app, false, false);
-    tray::clear_tray_title(&app);
-    
     // Play chime (break starting) and create break window
+    // (create_break_windows will set the proper tray state)
     play_chime_for_event(&app, ChimeEvent::BreakStart);
     create_break_windows(&app).await;
     
@@ -383,6 +388,12 @@ pub async fn take_break_now<R: Runtime>(app: AppHandle<R>) -> Result<(), String>
 
 /// Close all break windows (internal helper)
 fn close_break_windows_internal<R: Runtime>(app: &AppHandle<R>) {
+    let state = app.state::<AppState>();
+    
+    // Clear break state
+    state.set_on_break(false);
+    
+    // Close all break windows
     for (label, window) in app.webview_windows() {
         if label.starts_with("break") {
             let _ = window.close();
@@ -420,7 +431,9 @@ pub async fn create_break_windows<R: Runtime>(app: &AppHandle<R>) {
     // Reset session state (break is starting)
     state.reset_session();
     
-    // Show "On break" in tray instead of timer
+    // Set break state and update tray menu to show break options
+    state.set_on_break(true);
+    tray::update_tray_menu(app, false, false, true);
     tray::set_tray_title(app, "On break");
     
     // Get all monitors
