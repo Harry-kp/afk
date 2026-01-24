@@ -5,7 +5,7 @@ use chrono::{Duration, Utc};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::sync::Arc;
-use tauri::{AppHandle, Manager, Runtime, State, WebviewUrl, WebviewWindowBuilder};
+use tauri::{AppHandle, Emitter, Manager, Runtime, State, WebviewUrl, WebviewWindowBuilder};
 
 // Note: WebviewUrl and WebviewWindowBuilder still needed for break windows
 use tauri_plugin_notification::NotificationExt;
@@ -454,8 +454,8 @@ pub async fn create_break_windows<R: Runtime>(app: &AppHandle<R>) {
     }
 }
 
-/// Show the main window (always use single window)
-pub fn show_settings_window<R: Runtime>(app: &AppHandle<R>, _open_dashboard: bool) {
+/// Show the main window and navigate to dashboard or settings
+pub fn show_settings_window<R: Runtime>(app: &AppHandle<R>, open_dashboard: bool) {
     // Always use the "main" window - single window UX
     if let Some(window) = app.get_webview_window("main") {
         // Show dock icon on macOS
@@ -466,5 +466,9 @@ pub fn show_settings_window<R: Runtime>(app: &AppHandle<R>, _open_dashboard: boo
         
         let _ = window.show();
         let _ = window.set_focus();
+        
+        // Emit event to navigate
+        let view = if open_dashboard { "dashboard" } else { "settings" };
+        let _ = window.emit("navigate", view);
     }
 }

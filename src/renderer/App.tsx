@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { listen } from '@tauri-apps/api/event';
 import Break from './Break';
 import Settings from './Settings';
 import Overview from './Overview';
@@ -27,6 +28,21 @@ function ViewManager() {
       // Default to dashboard
       setViewType('dashboard');
     }
+  }, []);
+
+  // Listen for navigation events from tray menu
+  useEffect(() => {
+    const unlisten = listen<string>('navigate', (event) => {
+      if (event.payload === 'settings') {
+        setShowSettings(true);
+      } else if (event.payload === 'dashboard') {
+        setShowSettings(false);
+      }
+    });
+
+    return () => {
+      unlisten.then((fn) => fn());
+    };
   }, []);
 
   if (viewType === 'settings' || viewType === 'dashboard') {
