@@ -91,5 +91,5 @@ MIT — see [LICENSE](LICENSE).
 
 <p align="center">
   Built by <a href="https://github.com/Harry-kp">Harry</a> • 
-  <a href="https://twitter.com/Harry_kp_">Twitter</a>
+  <a href="https://x.com/Harshitc007">Twitter</a>
 </p>
