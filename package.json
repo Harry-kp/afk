@@ -4,10 +4,22 @@
   "description": "AFK - Step away from your keyboard with mindful break reminders",
   "license": "MIT",
   "author": {
-    "name": "Harry-kp",
-    "email": "chaudharyharshit9@gmail.com",
-    "url": "https://github.com/Harry-kp"
+    "name": "Chaitanya Aaditya",
+    "email": "ca.chaitanya.2204@gmail.com",
+    "url": "https://github.com/holaChaitanya"
   },
+  "contributors": [
+    {
+      "name": "Chaitanya Aaditya",
+      "email": "ca.chaitanya.2204@gmail.com",
+      "url": "https://github.com/holaChaitanya"
+    },
+    {
+      "name": "Harry-kp",
+      "email": "chaudharyharshit9@gmail.com",
+      "url": "https://github.com/Harry-kp"
+    }
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/Harry-kp/afk.git"

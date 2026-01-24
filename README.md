@@ -90,6 +90,6 @@ MIT — see [LICENSE](LICENSE).
 ---
 
 <p align="center">
-  Built by <a href="https://github.com/Harry-kp">Harry</a> • 
-  <a href="https://x.com/Harshitc007">Twitter</a>
+  Built by <a href="https://github.com/holaChaitanya">Chaitanya</a> & <a href="https://github.com/Harry-kp">Harry</a><br>
+  <a href="https://x.com/holaChaitanya">@holaChaitanya</a> • <a href="https://x.com/Harry_kp_">@Harry_kp_</a>
 </p>

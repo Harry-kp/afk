@@ -34,8 +34,11 @@ import { track } from './lib/analytics';
 
 const APP_VERSION = '1.0.0';
 const LANDING_URL = 'https://afk-app.vercel.app';
-const TWITTER_URL = 'https://twitter.com/Harry_kp_';
-const GITHUB_URL = 'https://github.com/Harry-kp';
+// Authors
+const CHAITANYA_TWITTER = 'https://x.com/holaChaitanya';
+const CHAITANYA_GITHUB = 'https://github.com/holaChaitanya';
+const HARRY_TWITTER = 'https://x.com/Harry_kp_';
+const HARRY_GITHUB = 'https://github.com/Harry-kp';
 
 function ConfigPathSettings() {
   const [configPath, setConfigPath] = useState<string | null>(null);
@@ -252,11 +255,22 @@ function Settings({
                     <ExternalLink className="w-3 h-3" />
                   </a>
                   <a
-                    href={TWITTER_URL}
+                    href={CHAITANYA_TWITTER}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-neutral-400 hover:text-white transition-colors flex items-center gap-2"
-                    onClick={() => track('link_twitter')}
+                    onClick={() => track('link_twitter_chaitanya')}
+                  >
+                    <Twitter className="w-4 h-4" />
+                    @holaChaitanya
+                    <ExternalLink className="w-3 h-3" />
+                  </a>
+                  <a
+                    href={HARRY_TWITTER}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-neutral-400 hover:text-white transition-colors flex items-center gap-2"
+                    onClick={() => track('link_twitter_harry')}
                   >
                     <Twitter className="w-4 h-4" />
                     @Harry_kp_
@@ -265,15 +279,24 @@ function Settings({
                 </div>
 
                 {/* Made with love */}
-                <div className="text-neutral-500 text-sm flex items-center justify-center gap-1">
+                <div className="text-neutral-500 text-sm flex items-center justify-center gap-1 flex-wrap">
                   Made with <Heart className="w-4 h-4 text-red-500 fill-red-500" /> by
                   <a
-                    href={GITHUB_URL}
+                    href={CHAITANYA_GITHUB}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-neutral-400 hover:text-white transition-colors"
                   >
-                    Harry-kp
+                    Chaitanya
+                  </a>
+                  &
+                  <a
+                    href={HARRY_GITHUB}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-neutral-400 hover:text-white transition-colors"
+                  >
+                    Harry
                   </a>
                 </div>
                 <p className="text-neutral-600 text-xs mt-2">
