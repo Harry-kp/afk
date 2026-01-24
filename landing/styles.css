@@ -134,6 +134,70 @@ h3 {
   line-height: 1.4;
 }
 
+/* Download Options */
+.download-options {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-sm);
+}
+
+.download-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  text-decoration: none;
+  font-weight: 600;
+  border-radius: 12px;
+  padding: var(--space-sm) var(--space-md);
+  transition: all 0.2s;
+}
+
+.download-btn.primary {
+  background: var(--accent-gold);
+  color: #000;
+  font-size: 1rem;
+}
+
+.download-btn.primary:hover {
+  background: var(--accent-gold-light);
+  transform: translateY(-2px);
+}
+
+.download-btn.primary.large {
+  padding: var(--space-md) var(--space-lg);
+  font-size: 1.125rem;
+}
+
+.download-btn svg {
+  flex-shrink: 0;
+}
+
+.cta-buttons {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.step-download-btn {
+  display: inline-block;
+  background: var(--accent-gold);
+  color: #000;
+  text-decoration: none;
+  font-weight: 600;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  margin: var(--space-xs) 0;
+  transition: background 0.2s;
+}
+
+.step-download-btn:hover {
+  background: var(--accent-gold-light);
+}
+
 /* Install Box */
 .install-box {
   display: inline-flex;
@@ -143,7 +207,6 @@ h3 {
   border: 1px solid #3f3f46;
   border-radius: 12px;
   padding: var(--space-sm) var(--space-md);
-  margin-bottom: var(--space-sm);
 }
 
 .install-box.large {
@@ -439,6 +502,14 @@ footer p {
     font-size: 1.125rem;
   }
   
+  .download-options {
+    width: 100%;
+  }
+  
+  .download-btn.primary {
+    width: 100%;
+  }
+  
   .install-box {
     flex-direction: column;
     width: 100%;
@@ -457,6 +528,19 @@ footer p {
     width: 40px;
     height: 40px;
     font-size: 1rem;
+  }
+  
+  .cta-buttons {
+    width: 100%;
+  }
+  
+  .cta-buttons .download-btn.primary.large {
+    width: 100%;
+  }
+  
+  .footer-links {
+    flex-direction: column;
+    gap: var(--space-sm);
   }
 }
 

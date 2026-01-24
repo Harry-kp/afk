@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AFK - Step Away From Your Keyboard</title>
-  <meta name="description" content="AFK is a break reminder app for developers. Take mindful breaks, protect your eyes, and boost your focus.">
+  <title>Afk - Step Away From Your Keyboard</title>
+  <meta name="description" content="Afk is a break reminder app for developers. Take mindful breaks, protect your eyes, and boost your focus.">
   <meta name="keywords" content="break reminder, pomodoro, developer tools, eye strain, productivity, macos app">
   
   <!-- Open Graph -->
-  <meta property="og:title" content="AFK - Step Away From Your Keyboard">
+  <meta property="og:title" content="Afk - Step Away From Your Keyboard">
   <meta property="og:description" content="A break reminder app for developers. Your eyes will thank you.">
   <meta property="og:type" content="website">
   <meta property="og:image" content="/assets/og-image.png">
@@ -34,17 +34,27 @@
     <!-- Hero Section -->
     <section class="hero">
       <div class="hero-content">
-        <img src="/assets/icon.png" alt="AFK" class="hero-icon" width="80" height="80">
-        <h1>AFK</h1>
+        <img src="/assets/icon.png" alt="Afk" class="hero-icon" width="80" height="80">
+        <h1>Afk</h1>
         <p class="tagline">Step away from your keyboard.<br>Your eyes will thank you.</p>
         
-        <div class="install-box">
-          <code class="install-command">brew install --cask afk</code>
-          <button class="copy-btn" onclick="copyCommand()">Copy</button>
+        <div class="download-options">
+          <a href="#" id="download-btn" class="download-btn primary" onclick="downloadDMG(event)">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="7 10 12 15 17 10"/>
+              <line x1="12" y1="15" x2="12" y2="3"/>
+            </svg>
+            Download for macOS
+          </a>
+          <div class="install-box">
+            <code class="install-command">brew install --cask afk</code>
+            <button class="copy-btn" onclick="copyCommand()">Copy</button>
+          </div>
         </div>
         
         <p class="install-alt">
-          Don't have Homebrew? <a href="#install">See installation options below</a>
+          <a href="#install">First time? See setup instructions below</a>
         </p>
         
         <div class="hero-screenshot">
@@ -110,8 +120,11 @@
           <div class="step">
             <div class="step-number">1</div>
             <div class="step-content">
-              <h3>Install via Homebrew</h3>
-              <p>Open Terminal and run:</p>
+              <h3>Download &amp; Install</h3>
+              <p><strong>Option A:</strong> Direct download</p>
+              <a href="#" id="step-download-btn" class="step-download-btn" onclick="downloadDMG(event)">Download DMG</a>
+              <p class="step-note">Open the DMG and drag Afk to Applications.</p>
+              <p style="margin-top: 1rem;"><strong>Option B:</strong> Via Homebrew</p>
               <code>brew tap Harry-kp/tap && brew install --cask afk</code>
               <p class="step-note">Don't have Homebrew? Get it at <a href="https://brew.sh" target="_blank">brew.sh</a></p>
             </div>
@@ -163,9 +176,19 @@
     <section class="cta">
       <div class="container">
         <h2>Ready to treat your eyes better?</h2>
-        <div class="install-box large">
-          <code class="install-command">brew install --cask afk</code>
-          <button class="copy-btn" onclick="copyCommand()">Copy</button>
+        <div class="cta-buttons">
+          <a href="#" id="cta-download-btn" class="download-btn primary large" onclick="downloadDMG(event)">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="7 10 12 15 17 10"/>
+              <line x1="12" y1="15" x2="12" y2="3"/>
+            </svg>
+            Download for macOS
+          </a>
+          <div class="install-box large">
+            <code class="install-command">brew install --cask afk</code>
+            <button class="copy-btn" onclick="copyCommand()">Copy</button>
+          </div>
         </div>
         <p class="cta-subtext">Free forever. No account. No tracking. Just a simple tool that does one thing well.</p>
       </div>
@@ -185,6 +208,8 @@
   </main>
 
   <script>
+    let latestRelease = null;
+
     function copyCommand() {
       const command = 'brew tap Harry-kp/tap && brew install --cask afk';
       navigator.clipboard.writeText(command).then(() => {
@@ -196,12 +221,45 @@
       });
     }
 
+    function downloadDMG(event) {
+      event.preventDefault();
+      if (latestRelease && latestRelease.dmgUrl) {
+        window.location.href = latestRelease.dmgUrl;
+      } else {
+        // Fallback to releases page
+        window.open('https://github.com/Harry-kp/afk-releases/releases/latest', '_blank');
+      }
+    }
+
     // Fetch latest version from public releases repo
     fetch('https://api.github.com/repos/Harry-kp/afk-releases/releases/latest')
       .then(res => res.json())
       .then(data => {
         if (data.tag_name) {
-          document.getElementById('version').textContent = data.tag_name;
+          const version = data.tag_name;
+          document.getElementById('version').textContent = version;
+          
+          // Find the DMG asset
+          const dmgAsset = data.assets?.find(a => a.name.endsWith('.dmg'));
+          if (dmgAsset) {
+            latestRelease = {
+              version: version,
+              dmgUrl: dmgAsset.browser_download_url
+            };
+            
+            // Update download button text with version
+            const downloadBtns = document.querySelectorAll('.download-btn.primary');
+            downloadBtns.forEach(btn => {
+              btn.innerHTML = `
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                  <polyline points="7 10 12 15 17 10"/>
+                  <line x1="12" y1="15" x2="12" y2="3"/>
+                </svg>
+                Download ${version}
+              `;
+            });
+          }
         }
       })
       .catch(() => {});
