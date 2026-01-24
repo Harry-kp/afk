@@ -1,0 +1,169 @@
+# .github/workflows/test-distribution.yml
+name: Test Distribution
+
+on:
+  # Run after release workflow completes
+  workflow_run:
+    workflows: ["Release"]
+    types: [completed]
+  # Manual trigger for testing
+  workflow_dispatch:
+  # Weekly check to ensure distribution still works
+  schedule:
+    - cron: '0 9 * * 1' # Every Monday at 9 AM UTC
+
+jobs:
+  test-homebrew-cask:
+    runs-on: macos-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' || github.event_name == 'schedule' }}
+    steps:
+      - name: Get latest release info
+        id: release
+        run: |
+          RELEASE=$(curl -s https://api.github.com/repos/Harry-kp/afk-releases/releases/latest)
+          VERSION=$(echo "$RELEASE" | jq -r '.tag_name')
+          DMG_URL=$(echo "$RELEASE" | jq -r '.assets[] | select(.name | endswith(".dmg")) | .browser_download_url')
+          
+          echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+          echo "DMG_URL=$DMG_URL" >> $GITHUB_OUTPUT
+          echo "📦 Latest version: $VERSION"
+
+      - name: Verify DMG is downloadable
+        run: |
+          echo "🔍 Testing download URL..."
+          HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" -L "${{ steps.release.outputs.DMG_URL }}")
+          
+          if [ "$HTTP_CODE" != "200" ]; then
+            echo "❌ DMG download failed with HTTP $HTTP_CODE"
+            exit 1
+          fi
+          echo "✅ DMG is downloadable (HTTP 200)"
+
+      - name: Download and verify SHA256
+        run: |
+          echo "📥 Downloading DMG..."
+          curl -L -o test.dmg "${{ steps.release.outputs.DMG_URL }}"
+          
+          ACTUAL_SHA=$(shasum -a 256 test.dmg | awk '{print $1}')
+          echo "SHA256: $ACTUAL_SHA"
+          
+          # Fetch expected SHA from cask
+          CASK=$(curl -s https://raw.githubusercontent.com/Harry-kp/homebrew-tap/main/Casks/afk.rb)
+          EXPECTED_SHA=$(echo "$CASK" | grep 'sha256 "' | sed 's/.*sha256 "\([^"]*\)".*/\1/')
+          
+          echo "Expected: $EXPECTED_SHA"
+          echo "Actual:   $ACTUAL_SHA"
+          
+          if [ "$ACTUAL_SHA" != "$EXPECTED_SHA" ]; then
+            echo "❌ SHA256 mismatch!"
+            exit 1
+          fi
+          echo "✅ SHA256 matches"
+
+      - name: Test Homebrew installation
+        run: |
+          echo "🍺 Testing Homebrew installation..."
+          
+          # Tap and install
+          brew tap Harry-kp/tap
+          brew install --cask afk
+          
+          # Verify app exists
+          if [ ! -d "/Applications/Afk.app" ]; then
+            echo "❌ App not found in /Applications"
+            exit 1
+          fi
+          echo "✅ App installed to /Applications/Afk.app"
+
+      - name: Test app launches
+        run: |
+          echo "🚀 Testing app launch..."
+          
+          # Launch app in background
+          open -a Afk
+          sleep 5
+          
+          # Check if process is running
+          if pgrep -x "Afk" > /dev/null; then
+            echo "✅ App is running"
+            # Quit the app
+            pkill -x "Afk" || true
+          else
+            echo "❌ App failed to start"
+            exit 1
+          fi
+
+      - name: Cleanup
+        if: always()
+        run: |
+          pkill -x "Afk" 2>/dev/null || true
+          brew uninstall --cask afk 2>/dev/null || true
+          brew untap Harry-kp/tap 2>/dev/null || true
+
+  test-landing-page:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Test landing page is accessible
+        run: |
+          echo "🌐 Testing landing page..."
+          HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" https://afk-app.vercel.app)
+          
+          if [ "$HTTP_CODE" != "200" ]; then
+            echo "❌ Landing page returned HTTP $HTTP_CODE"
+            exit 1
+          fi
+          echo "✅ Landing page is accessible"
+
+      - name: Test download link on landing page
+        run: |
+          echo "🔗 Verifying download links..."
+          
+          # Fetch landing page and check for release API call
+          PAGE=$(curl -s https://afk-app.vercel.app)
+          
+          if echo "$PAGE" | grep -q "afk-releases"; then
+            echo "✅ Landing page references afk-releases repo"
+          else
+            echo "❌ Landing page missing release link"
+            exit 1
+          fi
+
+  notify-on-failure:
+    needs: [test-homebrew-cask, test-landing-page]
+    if: failure()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create issue on failure
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const title = '🚨 Distribution Test Failed';
+            const body = `The distribution test workflow failed. Please check:
+            
+            - [ ] DMG download URL is accessible
+            - [ ] SHA256 in homebrew-tap matches actual DMG
+            - [ ] Homebrew installation works
+            - [ ] App launches successfully
+            - [ ] Landing page is accessible
+            
+            [View failed workflow run](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
+            `;
+            
+            // Check if issue already exists
+            const issues = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              labels: 'distribution-test-failure'
+            });
+            
+            if (issues.data.length === 0) {
+              await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: title,
+                body: body,
+                labels: ['bug', 'distribution-test-failure']
+              });
+            }
+
