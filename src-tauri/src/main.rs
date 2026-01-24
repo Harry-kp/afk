@@ -64,6 +64,16 @@ fn main() {
                     }
                     window.hide().unwrap();
                     api.prevent_close();
+                } else if label.starts_with("break_") {
+                    // Break window was force-closed (Cmd+Q, Alt+F4, etc.)
+                    // Close ALL break windows to maintain consistent state
+                    let app = window.app_handle().clone();
+                    let state = app.state::<AppState>();
+                    if state.is_on_break() {
+                        tauri::async_runtime::spawn(async move {
+                            let _ = commands::skip_break(app).await;
+                        });
+                    }
                 }
             }
         })

@@ -489,7 +489,7 @@ pub async fn create_break_windows<R: Runtime>(app: &AppHandle<R>) {
         .decorations(false)
         .always_on_top(true)
         .skip_taskbar(true)
-        .focused(true);
+        .focused(i == 0);  // Only focus the primary monitor's break window
         
         if let Ok(window) = window.build() {
             let _ = window.show();
