@@ -265,20 +265,24 @@ async fn run_session_timer_loop<R: Runtime>(
             if pre_break_enabled && remaining_secs == pre_break_at {
                 let mins = pre_break_at / 60;
                 let title = if mins >= 1 {
-                    format!("Only {} min left", mins)
+                    format!("👀 Only {} min left", mins)
                 } else {
-                    "Less than a minute left".to_string()
+                    "👀 Less than a minute left".to_string()
                 };
                 
                 // Play reminder chime (if enabled)
                 play_chime_for_event(&app_handle, ChimeEvent::Reminder);
                 
-                let _ = app_handle
+                // Show macOS notification
+                if let Err(e) = app_handle
                     .notification()
                     .builder()
                     .title(&title)
-                    .body("Time to go AFK! 🍺")
-                    .show();
+                    .body("Get ready for your break")
+                    .show() 
+                {
+                    eprintln!("Failed to show notification: {:?}", e);
+                }
             }
             
             // Check if break time

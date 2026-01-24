@@ -9,6 +9,7 @@ mod utils;
 
 use state::AppState;
 use tauri::{Manager, RunEvent};
+use tauri_plugin_notification::NotificationExt;
 
 fn main() {
     let app = tauri::Builder::default()
@@ -25,6 +26,9 @@ fn main() {
             
             // Initialize power monitor (lock/unlock detection)
             power_monitor::init(app.handle().clone());
+            
+            // Request notification permission on macOS
+            let _ = app.notification().request_permission();
             
             // Check if we should start timer automatically
             let state = app.state::<AppState>();

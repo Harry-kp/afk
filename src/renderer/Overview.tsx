@@ -278,6 +278,7 @@ function Overview({
       </div>
       <div className="font-xl text-center text-neutral-200 py-4 flex items-baseline mt-20">
         After every&nbsp;
+        &nbsp;
         <Select
           value={String(sessionDuration)}
           onValueChange={(val: string) => {
@@ -293,7 +294,7 @@ function Overview({
           <SelectContent>
             <SelectGroup>
               <SelectItem key={900} value="900">
-                15 mins
+                1.5 mins
               </SelectItem>
               <SelectItem key={1200} value="1200">
                 20 mins
@@ -320,6 +321,7 @@ function Overview({
           </SelectContent>
         </Select>
         &nbsp;remind me to take breaks of&nbsp;
+        &nbsp;
         <Select
           value={String(breakDuration)}
           onValueChange={(val: string) => {
