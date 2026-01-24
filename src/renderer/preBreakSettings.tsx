@@ -21,14 +21,17 @@ export function PreBreakSettings() {
       <div className="grid gap-4">
         <div className="flex items-center justify-between space-x-2">
           <Label className="flex flex-col space-y-1">
-            <span>Pre Break reminders</span>
+            <span>Break notifications</span>
+            <span className="font-normal leading-snug text-muted-foreground text-xs">
+              System notification before break
+            </span>
           </Label>
           <div className="w-11 h-6 bg-muted animate-pulse rounded-full" />
         </div>
         <div className="flex items-center justify-between space-x-2">
           <Label className="flex flex-col space-y-1">
             <span className="font-normal leading-snug text-muted-foreground">
-              Show reminder before
+              Notify me before
             </span>
           </Label>
           <div className="w-[180px] h-10 bg-muted animate-pulse rounded-md" />
@@ -44,7 +47,10 @@ export function PreBreakSettings() {
           htmlFor="pre_break_reminder_enabled"
           className="flex flex-col space-y-1"
         >
-          <span>Pre Break reminders</span>
+          <span>Break notifications</span>
+          <span className="font-normal leading-snug text-muted-foreground text-xs">
+            System notification before break
+          </span>
         </Label>
         <Switch
           id="pre_break_reminder_enabled"
@@ -61,7 +67,7 @@ export function PreBreakSettings() {
           className="flex flex-col space-y-1"
         >
           <span className="font-normal leading-snug text-muted-foreground">
-            Show reminder before
+            Notify me before
           </span>
         </Label>
         <Select

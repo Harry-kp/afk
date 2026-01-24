@@ -294,7 +294,7 @@ function Overview({
           <SelectContent>
             <SelectGroup>
               <SelectItem key={900} value="900">
-                1.5 mins
+                1 mins
               </SelectItem>
               <SelectItem key={1200} value="1200">
                 20 mins
