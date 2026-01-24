@@ -39,7 +39,6 @@ const GITHUB_URL = 'https://github.com/Harry-kp';
 
 function DataSettings() {
   const [configPath, setConfigPath] = useState<string | null>(null);
-  const [showConfirm, setShowConfirm] = useState(false);
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
@@ -87,29 +86,21 @@ function DataSettings() {
         </button>
       </div>
 
-      {/* Reset to Defaults */}
+      {/* Reset to Defaults - double click with visual feedback */}
       <div className="flex items-center justify-between space-x-2">
         <Label className="flex flex-col space-y-1">
           <span>Reset settings</span>
           <span className="font-normal leading-snug text-muted-foreground text-xs">
-            {showConfirm ? 'Click again to confirm' : 'Restore all to defaults'}
+            Double-click to reset
           </span>
         </Label>
         <button
           type="button"
-          onClick={() => {
-            if (showConfirm) {
-              handleReset();
-            } else {
-              setShowConfirm(true);
-              // Auto-cancel after 3 seconds
-              setTimeout(() => setShowConfirm(false), 3000);
-            }
-          }}
-          className="p-2 hover:bg-muted rounded-md transition-colors"
-          title={showConfirm ? 'Click to confirm reset' : 'Reset to defaults'}
+          onDoubleClick={handleReset}
+          className="p-2 hover:bg-muted rounded-md transition-all group"
+          title="Double-click to reset"
         >
-          <RotateCcw className={`w-4 h-4 ${showConfirm ? 'text-yellow-500' : 'text-muted-foreground'}`} />
+          <RotateCcw className="w-4 h-4 text-muted-foreground group-hover:text-yellow-500 group-active:text-red-500 group-active:rotate-180 transition-all duration-300" />
         </button>
       </div>
     </div>
