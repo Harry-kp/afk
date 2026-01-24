@@ -48,3 +48,4 @@ src-tauri/gen/schemas/
 # Sentry
 .env.sentry-build-plugin
 homebrew-tap/
+scripts/
