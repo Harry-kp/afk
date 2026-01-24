@@ -13,8 +13,9 @@ import {
   Globe,
   Share2,
   ExternalLink,
-  FolderOpen,
+  Copy,
   RotateCcw,
+  Settings2,
 } from 'lucide-react';
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './components/ui/tabs';
@@ -38,6 +39,7 @@ const GITHUB_URL = 'https://github.com/Harry-kp';
 function DataSettings() {
   const [configPath, setConfigPath] = useState<string | null>(null);
   const [showConfirm, setShowConfirm] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     window.electron.app.getConfigPath().then(setConfigPath);
@@ -50,13 +52,12 @@ function DataSettings() {
     window.location.reload();
   };
 
-  const openConfigFolder = () => {
+  const copyConfigPath = () => {
     if (configPath) {
-      // Get folder path (remove filename)
-      const folderPath = configPath.substring(0, configPath.lastIndexOf('/'));
-      // Open in system file manager using shell
-      window.open(`file://${folderPath}`, '_blank');
-      track('config_folder_opened');
+      navigator.clipboard.writeText(configPath);
+      setCopied(true);
+      track('config_path_copied');
+      setTimeout(() => setCopied(false), 2000);
     }
   };
 
@@ -70,15 +71,19 @@ function DataSettings() {
             {configPath || 'Loading...'}
           </span>
         </Label>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={openConfigFolder}
+        <button
+          type="button"
+          onClick={copyConfigPath}
           disabled={!configPath}
+          className="p-2 hover:bg-muted rounded-md transition-colors disabled:opacity-50"
+          title="Copy path"
         >
-          <FolderOpen className="w-4 h-4 mr-2" />
-          Open Folder
-        </Button>
+          {copied ? (
+            <span className="text-green-500 text-xs">Copied!</span>
+          ) : (
+            <Copy className="w-4 h-4 text-muted-foreground" />
+          )}
+        </button>
       </div>
 
       {/* Reset to Defaults */}
@@ -194,7 +199,7 @@ function Settings({
               <Separator className="my-4" />
               <div className="pt-4" />
               <div className="flex items-start gap-x-8 [&>div]:w-full">
-                <FolderOpen width={20} height={20} className="mt-1" />
+                <Settings2 width={20} height={20} className="mt-1" />
                 <DataSettings />
               </div>
             </TabsContent>
