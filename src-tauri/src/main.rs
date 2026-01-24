@@ -78,9 +78,10 @@ fn main() {
                 } else if label.starts_with("break_") {
                     // Break window was force-closed (Cmd+Q, Alt+F4, etc.)
                     // Close ALL break windows to maintain consistent state
+                    // BUT skip if we're already closing programmatically (prevents race condition)
                     let app = window.app_handle().clone();
                     let state = app.state::<AppState>();
-                    if state.is_on_break() {
+                    if state.is_on_break() && !state.is_break_closing() {
                         tauri::async_runtime::spawn(async move {
                             let _ = commands::skip_break(app).await;
                         });

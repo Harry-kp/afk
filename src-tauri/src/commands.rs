@@ -417,6 +417,9 @@ pub async fn take_break_now<R: Runtime>(app: AppHandle<R>) -> Result<(), String>
 fn close_break_windows_internal<R: Runtime>(app: &AppHandle<R>) {
     let state = app.state::<AppState>();
     
+    // Set closing flag FIRST to prevent recursive handling from window close events
+    state.set_break_closing(true);
+    
     // Cancel break timer
     state.cancel_break_timer();
     
@@ -429,6 +432,9 @@ fn close_break_windows_internal<R: Runtime>(app: &AppHandle<R>) {
             let _ = window.close();
         }
     }
+    
+    // Clear closing flag
+    state.set_break_closing(false);
 }
 
 /// Close all break windows (command)
@@ -533,6 +539,11 @@ fn start_break_timer<R: Runtime>(app: &AppHandle<R>, break_duration: u64) {
             
             remaining -= 1;
             
+            // Check cancellation again before emitting (prevents race condition)
+            if *break_cancelled.lock() {
+                break;
+            }
+            
             // Emit tick to all break windows
             let _ = app_handle.emit("break-tick", remaining);
             
@@ -561,6 +572,9 @@ fn start_break_timer<R: Runtime>(app: &AppHandle<R>, break_duration: u64) {
 async fn end_break_internal<R: Runtime>(app: &AppHandle<R>) {
     let state = app.state::<AppState>();
     
+    // Set closing flag to prevent recursive handling
+    state.set_break_closing(true);
+    
     // Cancel break timer and close windows
     state.cancel_break_timer();
     state.set_on_break(false);
@@ -571,6 +585,9 @@ async fn end_break_internal<R: Runtime>(app: &AppHandle<R>) {
             let _ = window.close();
         }
     }
+    
+    // Clear closing flag
+    state.set_break_closing(false);
     
     // Play chime and start new session
     play_chime_for_event(app, ChimeEvent::BreakEnd);

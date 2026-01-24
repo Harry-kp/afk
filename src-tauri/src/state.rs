@@ -77,6 +77,8 @@ pub struct AppState {
     pub short_break_count: Mutex<u64>,
     /// Flag to track if user is currently on a break
     pub on_break: Mutex<bool>,
+    /// Flag to prevent recursive break window close handling
+    pub break_closing: Mutex<bool>,
 }
 
 impl AppState {
@@ -91,6 +93,7 @@ impl AppState {
             settings_path: Mutex::new(None),
             short_break_count: Mutex::new(0),
             on_break: Mutex::new(false),
+            break_closing: Mutex::new(false),
         }
     }
     
@@ -295,6 +298,16 @@ impl AppState {
     /// Reset break timer cancellation flag
     pub fn reset_break_cancelled(&self) {
         *self.break_cancelled.lock() = false;
+    }
+    
+    /// Check if break windows are being closed programmatically
+    pub fn is_break_closing(&self) -> bool {
+        *self.break_closing.lock()
+    }
+    
+    /// Set the break-closing flag
+    pub fn set_break_closing(&self, value: bool) {
+        *self.break_closing.lock() = value;
     }
 }
 
