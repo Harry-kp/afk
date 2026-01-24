@@ -134,18 +134,17 @@ jobs:
       - name: Test landing page is accessible
         run: |
           echo "🌐 Testing landing page..."
-          # Use browser-like user agent to avoid bot detection
+          # Use full browser-like headers to avoid bot detection
           HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" \
-            -H "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36" \
+            -H "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36" \
+            -H "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8" \
             https://afk-app.vercel.app)
           
           if [ "$HTTP_CODE" != "200" ]; then
-            echo "⚠️ Landing page returned HTTP $HTTP_CODE (may have Vercel protection enabled)"
-            # Don't fail - Vercel protection is common for private deployments
-            echo "::warning::Landing page returned $HTTP_CODE - check if Vercel protection is enabled"
-          else
-            echo "✅ Landing page is accessible"
+            echo "❌ Landing page returned HTTP $HTTP_CODE"
+            exit 1
           fi
+          echo "✅ Landing page is accessible (HTTP 200)"
 
       - name: Test download link resolves
         run: |
