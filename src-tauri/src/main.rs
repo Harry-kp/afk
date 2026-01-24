@@ -21,6 +21,12 @@ fn main() {
         ))
         .manage(AppState::new())
         .setup(|app| {
+            // Initialize settings persistence (load from disk)
+            let state = app.state::<AppState>();
+            if let Some(app_data_dir) = app.path().app_data_dir().ok() {
+                state.init_persistence(app_data_dir);
+            }
+            
             // Initialize the system tray
             tray::create_tray(app)?;
             
@@ -31,7 +37,6 @@ fn main() {
             let _ = app.notification().request_permission();
             
             // Check if we should start timer automatically
-            let state = app.state::<AppState>();
             if state.get_setting_bool("start_timer") {
                 let app_handle = app.handle().clone();
                 tauri::async_runtime::spawn(async move {
@@ -55,6 +60,8 @@ fn main() {
             commands::take_break_now,
             commands::close_break_windows,
             commands::add_time,
+            commands::reset_settings,
+            commands::get_config_path,
         ])
         .on_window_event(|window, event| {
             if let tauri::WindowEvent::CloseRequested { api, .. } = event {

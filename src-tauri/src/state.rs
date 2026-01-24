@@ -1,6 +1,8 @@
 use parking_lot::Mutex;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
+use std::fs;
+use std::path::PathBuf;
 use std::sync::Arc;
 use tauri::async_runtime::JoinHandle;
 
@@ -28,6 +30,33 @@ pub mod defaults {
     pub const DEFAULT_LONG_BREAK_AFTER: u64 = 2; // After 2 short breaks
 }
 
+/// Get default settings as a HashMap
+pub fn get_default_settings() -> HashMap<String, serde_json::Value> {
+    let mut settings = HashMap::new();
+    
+    settings.insert("launch_at_login".to_string(), serde_json::json!(true));
+    settings.insert("start_timer".to_string(), serde_json::json!(false));
+    settings.insert("session_duration".to_string(), serde_json::json!(defaults::DEFAULT_INTERVAL_DURATION));
+    settings.insert("break_duration".to_string(), serde_json::json!(defaults::DEFAULT_BREAK_DURATION));
+    settings.insert("pre_break_reminder_enabled".to_string(), serde_json::json!(true));
+    settings.insert("pre_break_reminder_at".to_string(), serde_json::json!(defaults::BREAK_NOTIFICATION_AT));
+    settings.insert("reset_timer_enabled".to_string(), serde_json::json!(true));
+    settings.insert("toolbar_timer_style".to_string(), serde_json::json!("remaining"));
+    settings.insert("long_break_enabled".to_string(), serde_json::json!(true));
+    settings.insert("long_break_duration".to_string(), serde_json::json!(defaults::DEFAULT_LONG_BREAK_DURATION));
+    settings.insert("long_break_after".to_string(), serde_json::json!(defaults::DEFAULT_LONG_BREAK_AFTER));
+    settings.insert("short_break_count".to_string(), serde_json::json!(0u64));
+    
+    // Chime settings (OFF by default - non-intrusive)
+    settings.insert("chime_enabled".to_string(), serde_json::json!(false));
+    settings.insert("chime_on_session_start".to_string(), serde_json::json!(true));
+    settings.insert("chime_on_break_start".to_string(), serde_json::json!(true));
+    settings.insert("chime_on_break_end".to_string(), serde_json::json!(true));
+    settings.insert("chime_on_reminder".to_string(), serde_json::json!(false));
+    
+    settings
+}
+
 /// Application state managed by Tauri
 pub struct AppState {
     /// Current session data
@@ -40,8 +69,10 @@ pub struct AppState {
     pub timer_cancelled: Arc<Mutex<bool>>,
     /// Flag to signal break timer cancellation
     pub break_cancelled: Arc<Mutex<bool>>,
-    /// Settings cache (will be synced with tauri-plugin-store)
+    /// Settings (persisted to disk)
     pub settings: Mutex<HashMap<String, serde_json::Value>>,
+    /// Path to settings file
+    pub settings_path: Mutex<Option<PathBuf>>,
     /// Short break count for long break calculation
     pub short_break_count: Mutex<u64>,
     /// Flag to track if user is currently on a break
@@ -50,39 +81,104 @@ pub struct AppState {
 
 impl AppState {
     pub fn new() -> Self {
-        let mut settings = HashMap::new();
-        
-        // Initialize with default values
-        settings.insert("launch_at_login".to_string(), serde_json::json!(true));
-        settings.insert("start_timer".to_string(), serde_json::json!(false));
-        settings.insert("session_duration".to_string(), serde_json::json!(defaults::DEFAULT_INTERVAL_DURATION));
-        settings.insert("break_duration".to_string(), serde_json::json!(defaults::DEFAULT_BREAK_DURATION));
-        settings.insert("pre_break_reminder_enabled".to_string(), serde_json::json!(true));
-        settings.insert("pre_break_reminder_at".to_string(), serde_json::json!(defaults::BREAK_NOTIFICATION_AT));
-        settings.insert("reset_timer_enabled".to_string(), serde_json::json!(true));
-        settings.insert("toolbar_timer_style".to_string(), serde_json::json!("remaining"));
-        settings.insert("long_break_enabled".to_string(), serde_json::json!(true));
-        settings.insert("long_break_duration".to_string(), serde_json::json!(defaults::DEFAULT_LONG_BREAK_DURATION));
-        settings.insert("long_break_after".to_string(), serde_json::json!(defaults::DEFAULT_LONG_BREAK_AFTER));
-        settings.insert("short_break_count".to_string(), serde_json::json!(0u64));
-        
-        // Chime settings (OFF by default - non-intrusive)
-        settings.insert("chime_enabled".to_string(), serde_json::json!(false));
-        settings.insert("chime_on_session_start".to_string(), serde_json::json!(true));
-        settings.insert("chime_on_break_start".to_string(), serde_json::json!(true));
-        settings.insert("chime_on_break_end".to_string(), serde_json::json!(true));
-        settings.insert("chime_on_reminder".to_string(), serde_json::json!(false));
-        
         Self {
             session: Mutex::new(Session::default()),
             session_timer_handle: Mutex::new(None),
             break_timer_handle: Mutex::new(None),
             timer_cancelled: Arc::new(Mutex::new(false)),
             break_cancelled: Arc::new(Mutex::new(false)),
-            settings: Mutex::new(settings),
+            settings: Mutex::new(get_default_settings()),
+            settings_path: Mutex::new(None),
             short_break_count: Mutex::new(0),
             on_break: Mutex::new(false),
         }
+    }
+    
+    /// Initialize settings path and load from disk
+    pub fn init_persistence(&self, app_data_dir: PathBuf) {
+        // Ensure directory exists
+        if let Err(e) = fs::create_dir_all(&app_data_dir) {
+            eprintln!("Failed to create app data directory: {}", e);
+            return;
+        }
+        
+        let settings_file = app_data_dir.join("settings.json");
+        *self.settings_path.lock() = Some(settings_file.clone());
+        
+        // Load from disk
+        self.load_settings();
+    }
+    
+    /// Load settings from disk, merging with defaults
+    pub fn load_settings(&self) {
+        let path = self.settings_path.lock().clone();
+        let Some(path) = path else { return };
+        
+        if !path.exists() {
+            // No settings file - save defaults
+            self.save_settings();
+            return;
+        }
+        
+        match fs::read_to_string(&path) {
+            Ok(contents) => {
+                match serde_json::from_str::<HashMap<String, serde_json::Value>>(&contents) {
+                    Ok(loaded) => {
+                        // Merge loaded settings with defaults (defaults fill in missing keys)
+                        let defaults = get_default_settings();
+                        let mut settings = self.settings.lock();
+                        
+                        // Start with defaults
+                        *settings = defaults;
+                        
+                        // Override with loaded values
+                        for (key, value) in loaded {
+                            settings.insert(key, value);
+                        }
+                        
+                        println!("Settings loaded from: {}", path.display());
+                    }
+                    Err(e) => {
+                        eprintln!("Failed to parse settings file: {}", e);
+                        // Keep defaults
+                    }
+                }
+            }
+            Err(e) => {
+                eprintln!("Failed to read settings file: {}", e);
+                // Keep defaults
+            }
+        }
+    }
+    
+    /// Save current settings to disk
+    pub fn save_settings(&self) {
+        let path = self.settings_path.lock().clone();
+        let Some(path) = path else { return };
+        
+        let settings = self.settings.lock();
+        
+        match serde_json::to_string_pretty(&*settings) {
+            Ok(json) => {
+                if let Err(e) = fs::write(&path, json) {
+                    eprintln!("Failed to write settings file: {}", e);
+                }
+            }
+            Err(e) => {
+                eprintln!("Failed to serialize settings: {}", e);
+            }
+        }
+    }
+    
+    /// Reset all settings to defaults and save
+    pub fn reset_to_defaults(&self) {
+        *self.settings.lock() = get_default_settings();
+        self.save_settings();
+    }
+    
+    /// Get the settings file path
+    pub fn get_settings_path(&self) -> Option<String> {
+        self.settings_path.lock().as_ref().map(|p| p.display().to_string())
     }
     
     /// Get a setting value

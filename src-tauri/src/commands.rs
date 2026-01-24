@@ -108,6 +108,9 @@ pub async fn set_setting<R: Runtime>(
     // Update in-memory cache
     state.set_setting(&key, value);
     
+    // Persist to disk
+    state.save_settings();
+    
     Ok(())
 }
 
@@ -615,4 +618,18 @@ pub fn show_settings_window<R: Runtime>(app: &AppHandle<R>, open_dashboard: bool
         let view = if open_dashboard { "dashboard" } else { "settings" };
         let _ = window.emit("navigate", view);
     }
+}
+
+/// Reset all settings to defaults
+#[tauri::command]
+pub async fn reset_settings(state: State<'_, AppState>) -> Result<(), String> {
+    state.reset_to_defaults();
+    Ok(())
+}
+
+/// Get the config file path
+#[tauri::command]
+pub async fn get_config_path(state: State<'_, AppState>) -> Result<String, String> {
+    state.get_settings_path()
+        .ok_or_else(|| "Config path not initialized".to_string())
 }

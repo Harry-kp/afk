@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import {
   Monitor,
   EyeOff,
@@ -12,11 +13,14 @@ import {
   Globe,
   Share2,
   ExternalLink,
+  FolderOpen,
+  RotateCcw,
 } from 'lucide-react';
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './components/ui/tabs';
 import { Separator } from './components/ui/separator';
 import { Button } from './components/ui/button';
+import { Label } from './components/ui/label';
 import { StartupSettings } from './startupSettings';
 import { FocusSettings } from './focusSettings';
 import { IdleTimeSettings } from './idleTimeSettings';
@@ -30,6 +34,92 @@ const APP_VERSION = '1.0.0';
 const LANDING_URL = 'https://afk-app.vercel.app';
 const TWITTER_URL = 'https://twitter.com/Harry_kp_';
 const GITHUB_URL = 'https://github.com/Harry-kp';
+
+function DataSettings() {
+  const [configPath, setConfigPath] = useState<string | null>(null);
+  const [showConfirm, setShowConfirm] = useState(false);
+
+  useEffect(() => {
+    window.electron.app.getConfigPath().then(setConfigPath);
+  }, []);
+
+  const handleReset = async () => {
+    await window.electron.app.resetSettings();
+    track('settings_reset');
+    // Reload the page to reflect changes
+    window.location.reload();
+  };
+
+  const openConfigFolder = () => {
+    if (configPath) {
+      // Get folder path (remove filename)
+      const folderPath = configPath.substring(0, configPath.lastIndexOf('/'));
+      // Open in system file manager using shell
+      window.open(`file://${folderPath}`, '_blank');
+      track('config_folder_opened');
+    }
+  };
+
+  return (
+    <div className="grid gap-4">
+      {/* Config Path */}
+      <div className="flex items-center justify-between space-x-2">
+        <Label className="flex flex-col space-y-1">
+          <span>Config location</span>
+          <span className="font-normal leading-snug text-muted-foreground text-xs font-mono truncate max-w-[300px]">
+            {configPath || 'Loading...'}
+          </span>
+        </Label>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={openConfigFolder}
+          disabled={!configPath}
+        >
+          <FolderOpen className="w-4 h-4 mr-2" />
+          Open Folder
+        </Button>
+      </div>
+
+      {/* Reset to Defaults */}
+      <div className="flex items-center justify-between space-x-2">
+        <Label className="flex flex-col space-y-1">
+          <span>Reset settings</span>
+          <span className="font-normal leading-snug text-muted-foreground text-xs">
+            Restore all settings to defaults
+          </span>
+        </Label>
+        {showConfirm ? (
+          <div className="flex gap-2">
+            <Button
+              variant="destructive"
+              size="sm"
+              onClick={handleReset}
+            >
+              Confirm Reset
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowConfirm(false)}
+            >
+              Cancel
+            </Button>
+          </div>
+        ) : (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setShowConfirm(true)}
+          >
+            <RotateCcw className="w-4 h-4 mr-2" />
+            Reset to Defaults
+          </Button>
+        )}
+      </div>
+    </div>
+  );
+}
 
 function Settings({
   setShowSettings,
@@ -99,6 +189,13 @@ function Settings({
               <div className="flex items-start gap-x-8 [&>div]:w-full">
                 <Volume2 width={20} height={20} className="mt-1" />
                 <ChimeSettings />
+              </div>
+              <div className="pt-4" />
+              <Separator className="my-4" />
+              <div className="pt-4" />
+              <div className="flex items-start gap-x-8 [&>div]:w-full">
+                <FolderOpen width={20} height={20} className="mt-1" />
+                <DataSettings />
               </div>
             </TabsContent>
             <TabsContent value="about">

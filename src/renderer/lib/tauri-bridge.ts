@@ -179,6 +179,12 @@ const app = {
     const result = await safeInvoke<string>('get_app_version');
     return result ?? '1.0.0';
   },
+  resetSettings: async (): Promise<void> => {
+    await safeInvoke('reset_settings');
+  },
+  getConfigPath: async (): Promise<string | null> => {
+    return await safeInvoke<string>('get_config_path');
+  },
 };
 
 /**
