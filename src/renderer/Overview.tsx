@@ -19,6 +19,7 @@ import {
 } from './components/ui/select';
 import { useToast } from './components/ui/use-toast';
 import { Toaster } from './components/ui/toaster';
+import { SESSION_DURATION_OPTIONS, SHORT_BREAK_OPTIONS, formatDuration, isCustomValue } from './constants';
 
 export function getReadableTime(durationInSeconds: number) {
   const hours = Math.floor(durationInSeconds / 3600);
@@ -288,35 +289,23 @@ function Overview({
             window.electron.store.set('session_duration', numVal);
           }}
         >
-          <SelectTrigger className="w-[70px] px-0">
-            <SelectValue placeholder="Duration" />
+          <SelectTrigger className="w-[80px] px-0">
+            <SelectValue placeholder="Duration">
+              {formatDuration(sessionDuration)}
+            </SelectValue>
           </SelectTrigger>
           <SelectContent>
             <SelectGroup>
-              <SelectItem key={900} value="900">
-                15 mins
-              </SelectItem>
-              <SelectItem key={1200} value="1200">
-                20 mins
-              </SelectItem>
-              <SelectItem key={1500} value="1500">
-                25 mins
-              </SelectItem>
-              <SelectItem key={1800} value="1800">
-                30 mins
-              </SelectItem>
-              <SelectItem key={2100} value="2100">
-                35 mins
-              </SelectItem>
-              <SelectItem key={2400} value="2400">
-                40 mins
-              </SelectItem>
-              <SelectItem key={2700} value="2700">
-                45 mins
-              </SelectItem>
-              <SelectItem key={3000} value="3000">
-                50 mins
-              </SelectItem>
+              {SESSION_DURATION_OPTIONS.map((opt) => (
+                <SelectItem key={opt.value} value={String(opt.value)}>
+                  {opt.label}
+                </SelectItem>
+              ))}
+              {isCustomValue(sessionDuration, SESSION_DURATION_OPTIONS) && (
+                <SelectItem key={sessionDuration} value={String(sessionDuration)}>
+                  {formatDuration(sessionDuration)}
+                </SelectItem>
+              )}
             </SelectGroup>
           </SelectContent>
         </Select>
@@ -331,35 +320,23 @@ function Overview({
             window.electron.store.set('break_duration', numVal);
           }}
         >
-          <SelectTrigger className="w-[70px] px-0">
-            <SelectValue placeholder="Duration" />
+          <SelectTrigger className="w-[80px] px-0">
+            <SelectValue placeholder="Duration">
+              {formatDuration(breakDuration)}
+            </SelectValue>
           </SelectTrigger>
           <SelectContent>
             <SelectGroup>
-              <SelectItem key={20} value="20">
-                20 secs
-              </SelectItem>
-              <SelectItem key={25} value="25">
-                25 secs
-              </SelectItem>
-              <SelectItem key={30} value="30">
-                30 secs
-              </SelectItem>
-              <SelectItem key={35} value="35">
-                35 secs
-              </SelectItem>
-              <SelectItem key={45} value="45">
-                45 secs
-              </SelectItem>
-              <SelectItem key={50} value="50">
-                50 secs
-              </SelectItem>
-              <SelectItem key={55} value="55">
-                55 secs
-              </SelectItem>
-              <SelectItem key={60} value="60">
-                1 min
-              </SelectItem>
+              {SHORT_BREAK_OPTIONS.map((opt) => (
+                <SelectItem key={opt.value} value={String(opt.value)}>
+                  {opt.label}
+                </SelectItem>
+              ))}
+              {isCustomValue(breakDuration, SHORT_BREAK_OPTIONS) && (
+                <SelectItem key={breakDuration} value={String(breakDuration)}>
+                  {formatDuration(breakDuration)}
+                </SelectItem>
+              )}
             </SelectGroup>
           </SelectContent>
         </Select>

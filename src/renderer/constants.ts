@@ -3,6 +3,84 @@ export interface Copy {
   subtitle: string;
 }
 
+// ============================================
+// TIMING OPTIONS (Single Source of Truth)
+// ============================================
+
+export interface TimingOption {
+  value: number;  // in seconds
+  label: string;
+}
+
+// Focus/Session Duration Options (in seconds)
+export const SESSION_DURATION_OPTIONS: TimingOption[] = [
+  { value: 300, label: '5 min' },      // Quick task
+  { value: 600, label: '10 min' },     // Short focus
+  { value: 900, label: '15 min' },     // Light work
+  { value: 1200, label: '20 min' },    // Standard short
+  { value: 1500, label: '25 min' },    // Pomodoro classic
+  { value: 1800, label: '30 min' },    // Half hour
+  { value: 2700, label: '45 min' },    // Deep work
+  { value: 3600, label: '60 min' },    // Full hour
+];
+
+// Short Break Duration Options (in seconds)
+export const SHORT_BREAK_OPTIONS: TimingOption[] = [
+  { value: 15, label: '15 sec' },
+  { value: 20, label: '20 sec' },
+  { value: 30, label: '30 sec' },
+  { value: 45, label: '45 sec' },
+  { value: 60, label: '1 min' },
+  { value: 90, label: '1.5 min' },
+  { value: 120, label: '2 min' },
+];
+
+// Long Break Duration Options (in seconds)
+export const LONG_BREAK_OPTIONS: TimingOption[] = [
+  { value: 60, label: '1 min' },
+  { value: 120, label: '2 min' },
+  { value: 180, label: '3 min' },
+  { value: 300, label: '5 min' },
+  { value: 600, label: '10 min' },
+  { value: 900, label: '15 min' },
+];
+
+// Sessions before Long Break
+export const LONG_BREAK_AFTER_OPTIONS: TimingOption[] = [
+  { value: 2, label: '2 sessions' },
+  { value: 3, label: '3 sessions' },
+  { value: 4, label: '4 sessions' },
+  { value: 5, label: '5 sessions' },
+  { value: 6, label: '6 sessions' },
+];
+
+// Pre-break Reminder Options (in seconds)
+export const PRE_BREAK_REMINDER_OPTIONS: TimingOption[] = [
+  { value: 15, label: '15 sec' },
+  { value: 30, label: '30 sec' },
+  { value: 60, label: '1 min' },
+  { value: 120, label: '2 min' },
+  { value: 300, label: '5 min' },
+];
+
+// Helper to format seconds to readable string
+export function formatDuration(seconds: number): string {
+  if (seconds < 60) {
+    return `${seconds} sec`;
+  }
+  const mins = Math.floor(seconds / 60);
+  const secs = seconds % 60;
+  if (secs === 0) {
+    return mins === 1 ? '1 min' : `${mins} min`;
+  }
+  return `${mins}m ${secs}s`;
+}
+
+// Helper to check if value is in options list
+export function isCustomValue(value: number, options: TimingOption[]): boolean {
+  return !options.some(opt => opt.value === value);
+}
+
 // Short break quotes - gentle, quick reminders
 export const COPIES: Copy[] = [
   {

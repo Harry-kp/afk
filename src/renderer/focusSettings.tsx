@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Label } from './components/ui/label';
 import {
   Select,
@@ -8,9 +9,12 @@ import {
   SelectValue,
 } from './components/ui/select';
 import { useSetting } from './hooks/useSetting';
+import { SESSION_DURATION_OPTIONS, formatDuration, isCustomValue } from './constants';
 
 export function FocusSettings() {
   const [sessionDuration, setSessionDuration, isLoading] = useSetting<number>('session_duration', 1500);
+  const [showCustomInput, setShowCustomInput] = useState(false);
+  const [customMinutes, setCustomMinutes] = useState('');
 
   if (isLoading) {
     return (
@@ -25,50 +29,87 @@ export function FocusSettings() {
     );
   }
 
+  const handleCustomSubmit = () => {
+    const mins = parseInt(customMinutes, 10);
+    if (mins >= 1 && mins <= 120) {
+      setSessionDuration(mins * 60);
+      setShowCustomInput(false);
+      setCustomMinutes('');
+    }
+  };
+
+  // Check if current value is custom (not in preset list)
+  const hasCustomValue = isCustomValue(sessionDuration, SESSION_DURATION_OPTIONS);
+
   return (
     <div className="grid gap-4">
       <div className="flex items-center justify-between space-x-2">
-        <Label htmlFor="necessary" className="flex flex-col">
+        <Label htmlFor="focus_duration" className="flex flex-col">
           <span>Focus Duration</span>
         </Label>
-        <Select
-          value={String(sessionDuration)}
-          onValueChange={(val) => {
-            setSessionDuration(Number(val));
-          }}
-        >
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Duration" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectGroup>
-              <SelectItem key={900} value="900">
-                15 mins
-              </SelectItem>
-              <SelectItem key={1200} value="1200">
-                20 mins
-              </SelectItem>
-              <SelectItem key={1500} value="1500">
-                25 mins
-              </SelectItem>
-              <SelectItem key={1800} value="1800">
-                30 mins
-              </SelectItem>
-              <SelectItem key={2100} value="2100">
-                35 mins
-              </SelectItem>
-              <SelectItem key={2400} value="2400">
-                40 mins
-              </SelectItem>
-              <SelectItem key={2700} value="2700">
-                45 mins
-              </SelectItem>
-              <SelectItem key={3000} value="3000">
-                50 mins
-              </SelectItem>
-            </SelectGroup>
-          </SelectContent>
-        </Select>
+        {showCustomInput ? (
+          <div className="flex items-center gap-2">
+            <input
+              type="number"
+              min="1"
+              max="120"
+              placeholder="mins"
+              value={customMinutes}
+              onChange={(e) => setCustomMinutes(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && handleCustomSubmit()}
+              className="w-20 h-10 px-3 rounded-md border border-input bg-background text-sm"
+              autoFocus
+            />
+            <button
+              type="button"
+              onClick={handleCustomSubmit}
+              className="h-10 px-3 rounded-md bg-primary text-primary-foreground text-sm hover:bg-primary/90"
+            >
+              Set
+            </button>
+            <button
+              type="button"
+              onClick={() => setShowCustomInput(false)}
+              className="h-10 px-3 rounded-md bg-muted text-muted-foreground text-sm hover:bg-muted/80"
+            >
+              ✕
+            </button>
+          </div>
+        ) : (
+          <Select
+            value={String(sessionDuration)}
+            onValueChange={(val) => {
+              if (val === 'custom') {
+                setShowCustomInput(true);
+              } else {
+                setSessionDuration(Number(val));
+              }
+            }}
+          >
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Duration">
+                {formatDuration(sessionDuration)}
+              </SelectValue>
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                {SESSION_DURATION_OPTIONS.map((opt) => (
+                  <SelectItem key={opt.value} value={String(opt.value)}>
+                    {opt.label}
+                  </SelectItem>
+                ))}
+                {hasCustomValue && (
+                  <SelectItem key={sessionDuration} value={String(sessionDuration)}>
+                    {formatDuration(sessionDuration)} (custom)
+                  </SelectItem>
+                )}
+                <SelectItem key="custom" value="custom" className="text-muted-foreground">
+                  Custom...
+                </SelectItem>
+              </SelectGroup>
+            </SelectContent>
+          </Select>
+        )}
       </div>
     </div>
   );

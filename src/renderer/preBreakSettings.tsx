@@ -9,6 +9,7 @@ import {
 } from './components/ui/select';
 import { Switch } from './components/ui/switch';
 import { useSetting } from './hooks/useSetting';
+import { PRE_BREAK_REMINDER_OPTIONS, formatDuration } from './constants';
 
 export function PreBreakSettings() {
   const [preBreakReminderEnabled, setPreBreakReminderEnabled, isLoading1] = useSetting<boolean>('pre_break_reminder_enabled', true);
@@ -79,22 +80,17 @@ export function PreBreakSettings() {
           disabled={!preBreakReminderEnabled}
         >
           <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Duration" />
+            <SelectValue placeholder="Duration">
+              {formatDuration(preBreakReminderAt)}
+            </SelectValue>
           </SelectTrigger>
           <SelectContent>
             <SelectGroup>
-              <SelectItem key={30} value="30">
-                30 secs
-              </SelectItem>
-              <SelectItem key={60} value="60">
-                1 min
-              </SelectItem>
-              <SelectItem key={120} value="120">
-                2 min
-              </SelectItem>
-              <SelectItem key={300} value="300">
-                5 min
-              </SelectItem>
+              {PRE_BREAK_REMINDER_OPTIONS.map((opt) => (
+                <SelectItem key={opt.value} value={String(opt.value)}>
+                  {opt.label}
+                </SelectItem>
+              ))}
             </SelectGroup>
           </SelectContent>
         </Select>

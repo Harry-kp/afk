@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Label } from './components/ui/label';
 import {
   Select,
@@ -9,11 +10,14 @@ import {
 } from './components/ui/select';
 import { Switch } from './components/ui/switch';
 import { useSetting } from './hooks/useSetting';
+import { LONG_BREAK_OPTIONS, LONG_BREAK_AFTER_OPTIONS, formatDuration, isCustomValue } from './constants';
 
 export function LongBreakSettings() {
   const [longBreakEnabled, setLongBreakEnabled, isLoading1] = useSetting<boolean>('long_break_enabled', true);
   const [longBreakDuration, setLongBreakDuration, isLoading2] = useSetting<number>('long_break_duration', 120);
   const [longBreakAfter, setLongBreakAfter, isLoading3] = useSetting<number>('long_break_after', 2);
+  const [showCustomInput, setShowCustomInput] = useState(false);
+  const [customMinutes, setCustomMinutes] = useState('');
 
   const isLoading = isLoading1 || isLoading2 || isLoading3;
 
@@ -33,6 +37,17 @@ export function LongBreakSettings() {
       </div>
     );
   }
+
+  const handleCustomSubmit = () => {
+    const mins = parseInt(customMinutes, 10);
+    if (mins >= 1 && mins <= 30) {
+      setLongBreakDuration(mins * 60);
+      setShowCustomInput(false);
+      setCustomMinutes('');
+    }
+  };
+
+  const hasCustomDuration = isCustomValue(longBreakDuration, LONG_BREAK_OPTIONS);
 
   return (
     <div className="grid gap-4">
@@ -59,40 +74,77 @@ export function LongBreakSettings() {
               Duration
             </span>
           </Label>
-          <Select
-            key="long_break_duration"
-            value={String(longBreakDuration)}
-            onValueChange={(val) => {
-              setLongBreakDuration(Number(val));
-            }}
-            disabled={!longBreakEnabled}
-          >
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Duration" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectGroup>
-                <SelectItem key={60} value="60">
-                  1 min
-                </SelectItem>
-                <SelectItem key={120} value="120">
-                  2 min
-                </SelectItem>
-                <SelectItem key={300} value="300">
-                  5 min
-                </SelectItem>
-                <SelectItem key={600} value="600">
-                  10 min
-                </SelectItem>
-              </SelectGroup>
-            </SelectContent>
-          </Select>
+          {showCustomInput ? (
+            <div className="flex items-center gap-2">
+              <input
+                type="number"
+                min="1"
+                max="30"
+                placeholder="mins"
+                value={customMinutes}
+                onChange={(e) => setCustomMinutes(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleCustomSubmit()}
+                className="w-16 h-10 px-3 rounded-md border border-input bg-background text-sm"
+                autoFocus
+              />
+              <button
+                type="button"
+                onClick={handleCustomSubmit}
+                className="h-10 px-2 rounded-md bg-primary text-primary-foreground text-sm hover:bg-primary/90"
+              >
+                Set
+              </button>
+              <button
+                type="button"
+                onClick={() => setShowCustomInput(false)}
+                className="h-10 px-2 rounded-md bg-muted text-muted-foreground text-sm hover:bg-muted/80"
+              >
+                ✕
+              </button>
+            </div>
+          ) : (
+            <Select
+              key="long_break_duration"
+              value={String(longBreakDuration)}
+              onValueChange={(val) => {
+                if (val === 'custom') {
+                  setShowCustomInput(true);
+                } else {
+                  setLongBreakDuration(Number(val));
+                }
+              }}
+              disabled={!longBreakEnabled}
+            >
+              <SelectTrigger className="w-[140px]">
+                <SelectValue placeholder="Duration">
+                  {formatDuration(longBreakDuration)}
+                </SelectValue>
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  {LONG_BREAK_OPTIONS.map((opt) => (
+                    <SelectItem key={opt.value} value={String(opt.value)}>
+                      {opt.label}
+                    </SelectItem>
+                  ))}
+                  {hasCustomDuration && (
+                    <SelectItem key={longBreakDuration} value={String(longBreakDuration)}>
+                      {formatDuration(longBreakDuration)} (custom)
+                    </SelectItem>
+                  )}
+                  <SelectItem key="custom" value="custom" className="text-muted-foreground">
+                    Custom...
+                  </SelectItem>
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+          )}
         </div>
 
         <div className="flex items-center gap-2">
           <Label htmlFor="long_break_after" className="flex flex-col space-y-1">
             <span className="font-normal leading-snug text-muted-foreground">
-              Repeat after number of short breaks
+              After sessions
             </span>
           </Label>
           <Select
@@ -103,23 +155,16 @@ export function LongBreakSettings() {
             }}
             disabled={!longBreakEnabled}
           >
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Duration" />
+            <SelectTrigger className="w-[140px]">
+              <SelectValue placeholder="Sessions" />
             </SelectTrigger>
             <SelectContent>
               <SelectGroup>
-                <SelectItem key={2} value="2">
-                  2
-                </SelectItem>
-                <SelectItem key={3} value="3">
-                  3
-                </SelectItem>
-                <SelectItem key={4} value="4">
-                  4
-                </SelectItem>
-                <SelectItem key={5} value="5">
-                  5
-                </SelectItem>
+                {LONG_BREAK_AFTER_OPTIONS.map((opt) => (
+                  <SelectItem key={opt.value} value={String(opt.value)}>
+                    {opt.label}
+                  </SelectItem>
+                ))}
               </SelectGroup>
             </SelectContent>
           </Select>
