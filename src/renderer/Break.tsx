@@ -1,10 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { listen } from '@tauri-apps/api/event';
 import confetti from 'canvas-confetti';
 import { track } from './lib/analytics';
 import { AuroraBackground } from './components/ui/aurora-background';
-import { COPIES } from './constants';
+import { COPIES, LONG_BREAK_COPIES } from './constants';
 
 function getTime(durationInSeconds: number) {
   const hours = Math.floor(durationInSeconds / 3600);
@@ -28,8 +28,6 @@ function getTime(durationInSeconds: number) {
   return result;
 }
 
-const copy = COPIES[Math.floor(Math.random() * COPIES.length)];
-
 // Start fading out when this many seconds are left
 const FADE_START_SECONDS = 3;
 
@@ -38,6 +36,12 @@ function Break({ isLongBreak, initialDuration }: { isLongBreak: boolean; initial
   const [seconds, setSeconds] = useState<number>(initialDuration);
   const [isClosing, setIsClosing] = useState(false);
   const [isFading, setIsFading] = useState(false);
+
+  // Select quote based on break type (memoized to stay consistent during break)
+  const copy = useMemo(() => {
+    const quotes = isLongBreak ? LONG_BREAK_COPIES : COPIES;
+    return quotes[Math.floor(Math.random() * quotes.length)];
+  }, [isLongBreak]);
 
   // Listen for backend break-tick events (single source of truth)
   useEffect(() => {
