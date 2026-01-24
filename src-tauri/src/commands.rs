@@ -216,68 +216,87 @@ pub async fn start_session_internal<R: Runtime>(
     // Update tray (session active, not paused, not on break)
     tray::update_tray_menu(app, true, false, false);
     
-    // Start the timer task
+    // Start session timer
+    start_session_timer(app);
+}
+
+/// Start the session countdown timer
+fn start_session_timer<R: Runtime>(app: &AppHandle<R>) {
+    let state = app.state::<AppState>();
     let app_handle = app.clone();
     let timer_cancelled = Arc::clone(&state.timer_cancelled);
     
     let handle = tauri::async_runtime::spawn(async move {
-        loop {
-            if *timer_cancelled.lock() {
-                break;
-            }
-            
-            tokio::time::sleep(tokio::time::Duration::from_secs(1)).await;
-            
-            if *timer_cancelled.lock() {
-                break;
-            }
-            
-            let state = app_handle.state::<AppState>();
-            let session = state.get_session();
-            
-            if let Some(end_time) = &session.end_time {
-                let remaining_secs = calculate_remaining_secs(end_time);
-                
-                // Update tray title
-                tray::update_tray_title(&app_handle, remaining_secs);
-                
-                // Check for pre-break notification
-                let pre_break_enabled = state.get_setting_bool("pre_break_reminder_enabled");
-                let pre_break_at = state.get_setting_u64("pre_break_reminder_at") as i64;
-                
-                if pre_break_enabled && remaining_secs == pre_break_at {
-                    let mins = pre_break_at / 60;
-                    let title = if mins >= 1 {
-                        format!("Only {} min left", mins)
-                    } else {
-                        "Less than a minute left".to_string()
-                    };
-                    
-                    // Play reminder chime (if enabled)
-                    play_chime_for_event(&app_handle, ChimeEvent::Reminder);
-                    
-                    let _ = app_handle
-                        .notification()
-                        .builder()
-                        .title(&title)
-                        .body("Time to go AFK! 🍺")
-                        .show();
-                }
-                
-                // Check if break time
-                if remaining_secs <= 0 {
-                    // Time for a break! (create_break_windows will set the proper tray state)
-                    play_chime_for_event(&app_handle, ChimeEvent::BreakStart);
-                    create_break_windows(&app_handle).await;
-                    break;
-                }
-            } else {
-                break;
-            }
-        }
+        run_session_timer_loop(app_handle, timer_cancelled).await;
     });
     
     *state.session_timer_handle.lock() = Some(handle);
+}
+
+/// The session timer loop (runs until cancelled or break time)
+async fn run_session_timer_loop<R: Runtime>(
+    app_handle: AppHandle<R>,
+    timer_cancelled: Arc<parking_lot::Mutex<bool>>,
+) {
+    loop {
+        if *timer_cancelled.lock() {
+            break;
+        }
+        
+        tokio::time::sleep(tokio::time::Duration::from_secs(1)).await;
+        
+        if *timer_cancelled.lock() {
+            break;
+        }
+        
+        let state = app_handle.state::<AppState>();
+        let session = state.get_session();
+        
+        if let Some(end_time) = &session.end_time {
+            let remaining_secs = calculate_remaining_secs(end_time);
+            
+            // Update tray title
+            tray::update_tray_title(&app_handle, remaining_secs);
+            
+            // Check for pre-break notification
+            let pre_break_enabled = state.get_setting_bool("pre_break_reminder_enabled");
+            let pre_break_at = state.get_setting_u64("pre_break_reminder_at") as i64;
+            
+            if pre_break_enabled && remaining_secs == pre_break_at {
+                let mins = pre_break_at / 60;
+                let title = if mins >= 1 {
+                    format!("Only {} min left", mins)
+                } else {
+                    "Less than a minute left".to_string()
+                };
+                
+                // Play reminder chime (if enabled)
+                play_chime_for_event(&app_handle, ChimeEvent::Reminder);
+                
+                let _ = app_handle
+                    .notification()
+                    .builder()
+                    .title(&title)
+                    .body("Time to go AFK! 🍺")
+                    .show();
+            }
+            
+            // Check if break time
+            if remaining_secs <= 0 {
+                // Time for a break! 
+                play_chime_for_event(&app_handle, ChimeEvent::BreakStart);
+                trigger_break(&app_handle).await;
+                break;
+            }
+        } else {
+            break;
+        }
+    }
+}
+
+/// Trigger a break (called when session timer ends)
+async fn trigger_break<R: Runtime>(app: &AppHandle<R>) {
+    create_break_windows(app).await;
 }
 
 /// Pause the current session
@@ -349,11 +368,11 @@ pub async fn skip_break<R: Runtime>(app: AppHandle<R>) -> Result<(), String> {
     let state = app.state::<AppState>();
     let session_duration = state.get_setting_u64("session_duration");
     
-    // Start new session first (no chime for skip)
-    start_session_internal(&app, Some(session_duration), false).await;
-    
-    // Then close break windows
+    // Close break windows first (cancels break timer)
     close_break_windows_internal(&app);
+    
+    // Then start new session (no chime for skip)
+    start_session_internal(&app, Some(session_duration), false).await;
     
     Ok(())
 }
@@ -390,6 +409,9 @@ pub async fn take_break_now<R: Runtime>(app: AppHandle<R>) -> Result<(), String>
 fn close_break_windows_internal<R: Runtime>(app: &AppHandle<R>) {
     let state = app.state::<AppState>();
     
+    // Cancel break timer
+    state.cancel_break_timer();
+    
     // Clear break state
     state.set_on_break(false);
     
@@ -408,7 +430,7 @@ pub async fn close_break_windows<R: Runtime>(app: AppHandle<R>) -> Result<(), St
     Ok(())
 }
 
-/// Create break windows on all displays
+/// Create break windows on all displays and start the break timer
 pub async fn create_break_windows<R: Runtime>(app: &AppHandle<R>) {
     let state = app.state::<AppState>();
     
@@ -428,11 +450,19 @@ pub async fn create_break_windows<R: Runtime>(app: &AppHandle<R>) {
         state.increment_short_break_count();
     }
     
+    // Get break duration
+    let break_duration = if is_long_break {
+        state.get_setting_u64("long_break_duration")
+    } else {
+        state.get_setting_u64("break_duration")
+    };
+    
     // Reset session state (break is starting)
     state.reset_session();
     
     // Set break state and update tray menu to show break options
     state.set_on_break(true);
+    state.reset_break_cancelled();
     tray::update_tray_menu(app, false, false, true);
     tray::set_tray_title(app, "On break");
     
@@ -465,6 +495,102 @@ pub async fn create_break_windows<R: Runtime>(app: &AppHandle<R>) {
             let _ = window.show();
         }
     }
+    
+    // Start the backend break timer (single source of truth for all windows)
+    start_break_timer(app, break_duration);
+}
+
+/// Start the break countdown timer (backend-driven)
+fn start_break_timer<R: Runtime>(app: &AppHandle<R>, break_duration: u64) {
+    let state = app.state::<AppState>();
+    let app_handle = app.clone();
+    let break_cancelled = Arc::clone(&state.break_cancelled);
+    
+    let handle = tauri::async_runtime::spawn(async move {
+        let mut remaining = break_duration as i64;
+        
+        // Emit initial tick immediately
+        let _ = app_handle.emit("break-tick", remaining);
+        
+        loop {
+            if *break_cancelled.lock() {
+                break;
+            }
+            
+            tokio::time::sleep(tokio::time::Duration::from_secs(1)).await;
+            
+            if *break_cancelled.lock() {
+                break;
+            }
+            
+            remaining -= 1;
+            
+            // Emit tick to all break windows
+            let _ = app_handle.emit("break-tick", remaining);
+            
+            // Check if break is over
+            if remaining <= 0 {
+                // End break (emit event for frontend, then handle transition)
+                let _ = app_handle.emit("break-end", ());
+                
+                // Small delay to let frontend fade out
+                tokio::time::sleep(tokio::time::Duration::from_millis(200)).await;
+                
+                // Trigger end break from backend
+                let state = app_handle.state::<AppState>();
+                if state.is_on_break() {
+                    end_break_internal(&app_handle).await;
+                }
+                break;
+            }
+        }
+    });
+    
+    *state.break_timer_handle.lock() = Some(handle);
+}
+
+/// Internal function to end break and start new session
+async fn end_break_internal<R: Runtime>(app: &AppHandle<R>) {
+    let state = app.state::<AppState>();
+    
+    // Cancel break timer and close windows
+    state.cancel_break_timer();
+    state.set_on_break(false);
+    
+    // Close all break windows
+    for (label, window) in app.webview_windows() {
+        if label.starts_with("break") {
+            let _ = window.close();
+        }
+    }
+    
+    // Play chime and start new session
+    play_chime_for_event(app, ChimeEvent::BreakEnd);
+    
+    // Start new session using existing function
+    let session_duration = state.get_setting_u64("session_duration");
+    
+    // Reset timer flags
+    state.cancel_timer();
+    state.reset_timer_cancelled();
+    
+    // Set session end time
+    let end_time = Utc::now() + Duration::milliseconds((session_duration * 1000) as i64);
+    let end_time_str = end_time.to_rfc3339();
+    
+    state.update_session(|s| {
+        s.end_time = Some(end_time_str.clone());
+        s.paused = false;
+        s.remaining_time = None;
+        s.paused_at = None;
+        s.start_time = Some(now_iso());
+    });
+    
+    // Update tray
+    tray::update_tray_menu(app, true, false, false);
+    
+    // Start session timer
+    start_session_timer(app);
 }
 
 /// Show the main window and navigate to dashboard or settings

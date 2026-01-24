@@ -1,10 +1,10 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { listen } from '@tauri-apps/api/event';
 import confetti from 'canvas-confetti';
 import { track } from './lib/analytics';
 import { AuroraBackground } from './components/ui/aurora-background';
 import { COPIES } from './constants';
-import { getCurrentWindow } from '@tauri-apps/api/window';
 
 function getTime(durationInSeconds: number) {
   const hours = Math.floor(durationInSeconds / 3600);
@@ -37,46 +37,23 @@ function Break({ isLongBreak }: { isLongBreak: boolean }) {
   const [seconds, setSeconds] = useState<number | null>(null);
   const [isClosing, setIsClosing] = useState(false);
   const [isFading, setIsFading] = useState(false);
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Initialize break duration from store (must fetch from backend, not cache)
+  // Listen for backend break-tick events (single source of truth)
   useEffect(() => {
-    const initDuration = async () => {
-      const key = isLongBreak ? 'long_break_duration' : 'break_duration';
-      const defaultDuration = isLongBreak ? 120 : 30;
-      
-      // MUST use getAsync to fetch actual value from backend
-      // The break window is a new window with fresh cache defaults
-      const duration = await window.electron.store.getAsync<number>(key);
-      setSeconds(duration ?? defaultDuration);
-    };
-    initDuration();
-  }, [isLongBreak]);
+    const unlistenTick = listen<number>('break-tick', (event) => {
+      setSeconds(event.payload);
+    });
 
-  // Countdown timer
-  useEffect(() => {
-    if (seconds === null) return;
-    
-    intervalRef.current = setInterval(() => {
-      setSeconds((prev) => {
-        if (prev === null) return null;
-        if (prev <= 1) {
-          // Clear interval and close
-          if (intervalRef.current) {
-            clearInterval(intervalRef.current);
-          }
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
+    const unlistenEnd = listen('break-end', () => {
+      // Backend signals break is ending - start fade out
+      setIsFading(true);
+    });
 
     return () => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-      }
+      unlistenTick.then((fn) => fn());
+      unlistenEnd.then((fn) => fn());
     };
-  }, [seconds !== null]); // Only start when initialized
+  }, []);
 
   // Start fading when approaching end
   useEffect(() => {
@@ -84,19 +61,6 @@ function Break({ isLongBreak }: { isLongBreak: boolean }) {
       setIsFading(true);
     }
   }, [seconds, isFading]);
-
-  // Handle break end - actually close
-  useEffect(() => {
-    if (seconds === 0 && !isClosing) {
-      setIsClosing(true);
-      // End break and start new session
-      window.electron.session.endBreak();
-      // Small delay to ensure fade completes smoothly
-      setTimeout(() => {
-        getCurrentWindow().close().catch(console.error);
-      }, 200);
-    }
-  }, [seconds, isClosing]);
 
   // Confetti effect for long breaks
   useEffect(() => {
@@ -133,11 +97,8 @@ function Break({ isLongBreak }: { isLongBreak: boolean }) {
     setIsFading(true);
     
     track('break_skipped');
+    // Backend will close all windows
     await window.electron.session.skipBreak();
-    // Close after fade animation
-    setTimeout(() => {
-      getCurrentWindow().close().catch(console.error);
-    }, 500);
   };
 
   const handleSnooze = async () => {
@@ -146,14 +107,11 @@ function Break({ isLongBreak }: { isLongBreak: boolean }) {
     setIsFading(true);
     
     track('break_snoozed');
+    // Backend will close all windows
     await window.electron.session.snooze();
-    // Close after fade animation
-    setTimeout(() => {
-      getCurrentWindow().close().catch(console.error);
-    }, 500);
   };
 
-  // Show loading state while initializing
+  // Show loading state while waiting for first tick
   if (seconds === null) {
     return (
       <AuroraBackground>
@@ -167,7 +125,6 @@ function Break({ isLongBreak }: { isLongBreak: boolean }) {
   const { mins, secs } = getTime(seconds);
 
   // Calculate opacity based on fading state
-  // When isFading, animate to 0 over FADE_START_SECONDS
   const getAnimateState = () => {
     if (isClosing) {
       // User skipped/snoozed - quick fade out

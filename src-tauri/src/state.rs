@@ -34,8 +34,12 @@ pub struct AppState {
     pub session: Mutex<Session>,
     /// Handle to the running session timer task
     pub session_timer_handle: Mutex<Option<JoinHandle<()>>>,
+    /// Handle to the running break timer task
+    pub break_timer_handle: Mutex<Option<JoinHandle<()>>>,
     /// Flag to signal timer cancellation
     pub timer_cancelled: Arc<Mutex<bool>>,
+    /// Flag to signal break timer cancellation
+    pub break_cancelled: Arc<Mutex<bool>>,
     /// Settings cache (will be synced with tauri-plugin-store)
     pub settings: Mutex<HashMap<String, serde_json::Value>>,
     /// Short break count for long break calculation
@@ -72,7 +76,9 @@ impl AppState {
         Self {
             session: Mutex::new(Session::default()),
             session_timer_handle: Mutex::new(None),
+            break_timer_handle: Mutex::new(None),
             timer_cancelled: Arc::new(Mutex::new(false)),
+            break_cancelled: Arc::new(Mutex::new(false)),
             settings: Mutex::new(settings),
             short_break_count: Mutex::new(0),
             on_break: Mutex::new(false),
@@ -180,6 +186,19 @@ impl AppState {
     /// Set the on-break state
     pub fn set_on_break(&self, value: bool) {
         *self.on_break.lock() = value;
+    }
+    
+    /// Cancel the break timer
+    pub fn cancel_break_timer(&self) {
+        *self.break_cancelled.lock() = true;
+        if let Some(handle) = self.break_timer_handle.lock().take() {
+            handle.abort();
+        }
+    }
+    
+    /// Reset break timer cancellation flag
+    pub fn reset_break_cancelled(&self) {
+        *self.break_cancelled.lock() = false;
     }
 }
 
