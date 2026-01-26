@@ -128,9 +128,16 @@ impl StatsManager {
                 }
 
                 if let Ok(stored) = serde_json::from_str::<StoredStats>(&contents) {
-                    *self.daily_stats.lock() = stored.daily;
+                    // Prune old data (keep last 90 days only)
+                    let cutoff = (Local::now() - Duration::days(90)).format("%Y-%m-%d").to_string();
+                    let pruned: HashMap<String, DailyStats> = stored.daily
+                        .into_iter()
+                        .filter(|(date, _)| date >= &cutoff)
+                        .collect();
+                    
+                    *self.daily_stats.lock() = pruned;
                     *self.streak.lock() = stored.streak;
-                    println!("Stats loaded from: {}", path.display());
+                    println!("Stats loaded from: {} ({} days)", path.display(), self.daily_stats.lock().len());
                 }
             }
             Err(e) => eprintln!("Failed to read stats file: {}", e),
