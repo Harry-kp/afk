@@ -644,6 +644,14 @@ p {
   border-radius: var(--radius-sm);
 }
 
+.peerlist-badge--hero {
+  margin-bottom: var(--space-md);
+}
+
+.peerlist-badge--hero img {
+  height: 36px;
+}
+
 /* ==========================================================================
    10. Features - Bento Grid
    ========================================================================== */
