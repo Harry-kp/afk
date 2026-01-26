@@ -118,10 +118,6 @@ pub async fn set_setting<R: Runtime>(
 /// Start a new session (plays chime if enabled)
 #[tauri::command]
 pub async fn start_session<R: Runtime>(app: AppHandle<R>) -> Result<(), String> {
-    // Track stats - new session started
-    let stats = app.state::<StatsManager>();
-    stats.session_started();
-    
     play_chime_for_event(&app, ChimeEvent::SessionStart);
     start_session_internal(&app, None, false).await;
     Ok(())
@@ -347,9 +343,9 @@ pub async fn pause_session<R: Runtime>(app: AppHandle<R>) -> Result<(), String> 
 pub async fn end_session<R: Runtime>(app: AppHandle<R>) -> Result<(), String> {
     let state = app.state::<AppState>();
     
-    // Track stats - session ended manually (not completed naturally)
+    // Flush any accumulated focus time before ending
     let stats = app.state::<StatsManager>();
-    stats.session_ended(false);
+    stats.flush_focus();
     
     // Close break windows if on break
     if state.is_on_break() {
@@ -373,17 +369,15 @@ pub async fn end_session<R: Runtime>(app: AppHandle<R>) -> Result<(), String> {
 /// End the break and start a new session
 #[tauri::command]
 pub async fn end_break<R: Runtime>(app: AppHandle<R>) -> Result<(), String> {
-    // Track stats - break completed (session ended naturally)
+    // Track stats - break completed (flushes focus time internally)
     let stats = app.state::<StatsManager>();
-    stats.session_ended(true);
     stats.break_completed();
     
     // Close break windows first
     close_break_windows_internal(&app);
     
-    // Start new session (chime for break end) - this starts a NEW session
+    // Start new session (chime for break end)
     play_chime_for_event(&app, ChimeEvent::BreakEnd);
-    stats.session_started();
     start_session_internal(&app, None, false).await;
     
     Ok(())
@@ -395,16 +389,14 @@ pub async fn skip_break<R: Runtime>(app: AppHandle<R>) -> Result<(), String> {
     let state = app.state::<AppState>();
     let session_duration = state.get_setting_u64("session_duration");
     
-    // Track stats - break skipped
+    // Track stats - break skipped (flushes focus time internally)
     let stats = app.state::<StatsManager>();
-    stats.session_ended(true);  // Session completed naturally (timer ran out)
     stats.break_skipped();
     
     // Close break windows first (cancels break timer)
     close_break_windows_internal(&app);
     
-    // Then start new session (no chime for skip) - this starts a NEW session
-    stats.session_started();
+    // Start new session (no chime for skip)
     start_session_internal(&app, Some(session_duration), false).await;
     
     Ok(())
@@ -413,16 +405,14 @@ pub async fn skip_break<R: Runtime>(app: AppHandle<R>) -> Result<(), String> {
 /// Snooze the break for 5 minutes
 #[tauri::command]
 pub async fn snooze_break<R: Runtime>(app: AppHandle<R>) -> Result<(), String> {
-    // Track stats - break skipped (snoozed counts as skipped)
+    // Track stats - snooze counts as skipped (flushes focus time internally)
     let stats = app.state::<StatsManager>();
-    stats.session_ended(true);
     stats.break_skipped();
     
     // Close break windows
     close_break_windows_internal(&app);
     
-    // Start a 5-minute session (no chime) - this is a new mini-session
-    stats.session_started();
+    // Start a 5-minute snooze session (no chime)
     start_session_internal(&app, Some(300), false).await;
     
     Ok(())
@@ -603,6 +593,10 @@ fn start_break_timer<R: Runtime>(app: &AppHandle<R>, break_duration: u64) {
 async fn end_break_internal<R: Runtime>(app: &AppHandle<R>) {
     let state = app.state::<AppState>();
     
+    // Track stats - break completed (flushes focus time internally)
+    let stats = app.state::<StatsManager>();
+    stats.break_completed();
+    
     // Set closing flag to prevent recursive handling
     state.set_break_closing(true);
     
@@ -623,7 +617,7 @@ async fn end_break_internal<R: Runtime>(app: &AppHandle<R>) {
     // Play chime and start new session
     play_chime_for_event(app, ChimeEvent::BreakEnd);
     
-    // Start new session using existing function
+    // Start new session
     let session_duration = state.get_setting_u64("session_duration");
     
     // Reset timer flags

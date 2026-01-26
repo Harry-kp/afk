@@ -42,10 +42,10 @@ Download the latest `.dmg` from [releases](https://github.com/Harry-kp/afk-relea
 - **Fullscreen break reminders** — Gentle overlays that respect your workflow
 - **Configurable timing** — 15-50 min sessions, 20s-5 min breaks
 - **Long breaks** — Automatic extended breaks after multiple sessions
-- **Statistics dashboard** — Track your focus time, breaks, and streaks
-- **Global keyboard shortcuts** — Control AFK from anywhere (⌘⇧N, ⌘⇧P, ⌘⇧B, ⌘⇧S)
-- **Health tips** — Stretch reminders and eye exercises during breaks
 - **Menu bar timer** — Always know when your next break is
+- **Statistics dashboard** — Track focus time, breaks, and streaks
+- **Global keyboard shortcuts** — Control AFK from anywhere (⌘⇧N, ⌘⇧P, ⌘⇧B, ⌘⇧S)
+- **Health reminders** — Stretches, eye exercises, and hydration tips during breaks
 - **Skip or snooze** — You're in control
 - **Launch at login** — Set it and forget it
 - **No account required** — Your data stays on your machine

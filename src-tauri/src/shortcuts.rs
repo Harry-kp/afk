@@ -104,3 +104,4 @@ pub async fn handle_shortcut<R: tauri::Runtime>(app: &tauri::AppHandle<R>, short
         }
     }
 }
+

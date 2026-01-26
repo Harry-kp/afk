@@ -141,9 +141,9 @@ function KeyboardShortcuts() {
   );
 }
 
-// Helper functions for stats
+// Format time for display
 function formatTime(seconds: number): string {
-  if (seconds < 60) return `${seconds}s`;
+  if (seconds < 60) return '0m';
   const hours = Math.floor(seconds / 3600);
   const minutes = Math.floor((seconds % 3600) / 60);
   if (hours > 0) {
@@ -152,9 +152,9 @@ function formatTime(seconds: number): string {
   return `${minutes}m`;
 }
 
-function getWeekdayShort(dateStr: string): string {
+function getWeekdayLetter(dateStr: string): string {
   const date = new Date(dateStr);
-  return date.toLocaleDateString('en-US', { weekday: 'short' });
+  return ['S', 'M', 'T', 'W', 'T', 'F', 'S'][date.getDay()];
 }
 
 function StatsContent() {
@@ -178,57 +178,66 @@ function StatsContent() {
   };
 
   if (loading) {
-    return <div className="text-center text-neutral-500 py-8">Loading...</div>;
+    return <div className="text-center text-neutral-500 py-12">Loading...</div>;
   }
 
-  if (!stats || stats.all_time.total_sessions === 0) {
+  if (!stats || stats.all_time.total_focus_secs === 0) {
     return (
-      <div className="text-center py-8">
-        <BarChart3 className="w-12 h-12 text-neutral-600 mx-auto mb-4" />
-        <p className="text-neutral-400">No data yet</p>
-        <p className="text-neutral-500 text-sm mt-1">Start a session to track your progress</p>
+      <div className="text-center py-12">
+        <div className="text-4xl mb-3">👀</div>
+        <p className="text-neutral-400">No stats yet</p>
+        <p className="text-neutral-600 text-sm mt-1">Start focusing to see your progress</p>
       </div>
     );
   }
 
-  const breakRate = (stats.today.breaks_taken + stats.today.breaks_skipped) > 0
-    ? Math.round((stats.today.breaks_taken / (stats.today.breaks_taken + stats.today.breaks_skipped)) * 100)
-    : 100;
+  const breaksTaken = stats.today.breaks_taken + stats.today.breaks_skipped;
+  const weekAvg = stats.week.avg_daily_focus_secs;
+  const todayVsAvg = weekAvg > 0 
+    ? Math.round(((stats.today.total_focus_secs - weekAvg) / weekAvg) * 100) 
+    : 0;
 
   return (
     <div className="space-y-6">
-      {/* Today */}
-      <div className="bg-neutral-800/50 rounded-lg p-4">
-        <h3 className="text-sm font-medium text-neutral-400 mb-3">Today</h3>
-        <div className="grid grid-cols-3 gap-4 text-center">
-          <div>
-            <div className="text-2xl font-bold text-white">{formatTime(stats.today.total_focus_secs)}</div>
-            <div className="text-xs text-neutral-500">Focus Time</div>
+      {/* Hero: Today's Focus */}
+      <div className="text-center pt-2 pb-4">
+        <div className="text-5xl font-bold text-white tracking-tight">
+          {formatTime(stats.today.total_focus_secs)}
+        </div>
+        <div className="text-neutral-500 text-sm mt-2">
+          focused today
+          {todayVsAvg !== 0 && Math.abs(todayVsAvg) >= 10 && (
+            <span className={todayVsAvg > 0 ? 'text-emerald-500' : 'text-amber-500'}>
+              {' · '}{todayVsAvg > 0 ? '+' : ''}{todayVsAvg}% vs avg
+            </span>
+          )}
+        </div>
+      </div>
+
+      {/* Two stat cards side by side */}
+      <div className="grid grid-cols-2 gap-3">
+        <div className="bg-neutral-800/40 rounded-xl p-4 text-center">
+          <div className="text-2xl font-bold text-white">{breaksTaken}</div>
+          <div className="text-neutral-500 text-xs mt-1">breaks today</div>
+        </div>
+        <div className="bg-neutral-800/40 rounded-xl p-4 text-center">
+          <div className="flex items-center justify-center gap-2">
+            <Flame className="w-5 h-5 text-amber-500" />
+            <span className="text-2xl font-bold text-white">{stats.streak.current}</span>
           </div>
-          <div>
-            <div className="text-2xl font-bold text-white">{stats.today.breaks_taken}</div>
-            <div className="text-xs text-neutral-500">Breaks Taken</div>
-          </div>
-          <div>
-            <div className="text-2xl font-bold text-white">{breakRate}%</div>
-            <div className="text-xs text-neutral-500">Break Rate</div>
+          <div className="text-neutral-500 text-xs mt-1">
+            day streak{stats.streak.longest > stats.streak.current && ` · best ${stats.streak.longest}`}
           </div>
         </div>
       </div>
 
-      {/* Streak */}
-      <div className="flex items-center gap-4 bg-neutral-800/50 rounded-lg p-4">
-        <Flame className="w-8 h-8 text-amber-500" />
-        <div>
-          <div className="text-xl font-bold text-white">{stats.streak.current} Day Streak</div>
-          <div className="text-xs text-neutral-500">Best: {stats.streak.longest} days</div>
+      {/* Week visualization */}
+      <div className="bg-neutral-800/40 rounded-xl p-4">
+        <div className="flex items-center justify-between mb-3">
+          <span className="text-neutral-400 text-sm">This week</span>
+          <span className="text-white text-sm font-medium">{formatTime(stats.week.total_focus_secs)}</span>
         </div>
-      </div>
-
-      {/* This Week */}
-      <div className="bg-neutral-800/50 rounded-lg p-4">
-        <h3 className="text-sm font-medium text-neutral-400 mb-3">This Week</h3>
-        <div className="flex items-end justify-between gap-1 h-16 mb-2">
+        <div className="flex items-end justify-between gap-1 h-12">
           {stats.weekly_trend.map((day, i) => {
             const maxVal = Math.max(...stats.weekly_trend.map(d => d.total_focus_secs), 1);
             const height = (day.total_focus_secs / maxVal) * 100;
@@ -236,57 +245,40 @@ function StatsContent() {
             return (
               <div key={day.date} className="flex flex-col items-center flex-1 gap-1">
                 <div
-                  className={`w-full rounded-t-sm ${isToday ? 'bg-amber-500' : day.total_focus_secs > 0 ? 'bg-neutral-600' : 'bg-neutral-700'}`}
-                  style={{ height: `${Math.max(height, 4)}%`, minHeight: '2px' }}
+                  className={`w-full rounded-sm transition-all ${
+                    isToday 
+                      ? 'bg-amber-500' 
+                      : day.total_focus_secs > 0 
+                        ? 'bg-neutral-600' 
+                        : 'bg-neutral-700/50'
+                  }`}
+                  style={{ height: `${Math.max(height, 8)}%`, minHeight: '3px' }}
                 />
-                <span className={`text-[10px] ${isToday ? 'text-amber-400' : 'text-neutral-500'}`}>
-                  {getWeekdayShort(day.date)}
+                <span className={`text-[10px] ${isToday ? 'text-amber-400' : 'text-neutral-600'}`}>
+                  {getWeekdayLetter(day.date)}
                 </span>
               </div>
             );
           })}
         </div>
-        <div className="text-center text-sm text-neutral-400">
-          {formatTime(stats.week.total_focus_secs)} total
-        </div>
       </div>
 
-      {/* All Time */}
-      <div className="bg-neutral-800/50 rounded-lg p-4">
-        <h3 className="text-sm font-medium text-neutral-400 mb-3">All Time</h3>
-        <div className="grid grid-cols-2 gap-4">
-          <div className="flex items-center gap-3">
-            <Target className="w-5 h-5 text-neutral-500" />
-            <div>
-              <div className="text-lg font-semibold text-white">{stats.all_time.total_sessions}</div>
-              <div className="text-xs text-neutral-500">Sessions</div>
-            </div>
-          </div>
-          <div className="flex items-center gap-3">
-            <TrendingUp className="w-5 h-5 text-neutral-500" />
-            <div>
-              <div className="text-lg font-semibold text-white">{formatTime(stats.all_time.total_focus_secs)}</div>
-              <div className="text-xs text-neutral-500">Focus Time</div>
-            </div>
-          </div>
-        </div>
+      {/* All-time summary - subtle */}
+      <div className="flex items-center justify-center gap-6 text-sm text-neutral-500 pt-2">
+        <span>All time: <span className="text-neutral-400">{formatTime(stats.all_time.total_focus_secs)}</span></span>
+        <span>·</span>
+        <span><span className="text-neutral-400">{stats.all_time.total_breaks}</span> breaks</span>
       </div>
 
-      {/* Clear Stats */}
-      <div className="flex items-center justify-between pt-4 border-t border-neutral-800">
-        <div>
-          <div className="text-sm text-neutral-400">Clear all statistics</div>
-          <div className="text-xs text-neutral-500">Double-click to clear</div>
-        </div>
-        <button
-          type="button"
-          onDoubleClick={handleClearStats}
-          className="p-2 hover:bg-neutral-800 rounded-md transition-colors group"
-          title="Double-click to clear"
-        >
-          <Trash2 className="w-4 h-4 text-neutral-500 group-hover:text-red-500 transition-colors" />
-        </button>
-      </div>
+      {/* Clear - tucked away */}
+      <button
+        type="button"
+        onDoubleClick={handleClearStats}
+        className="w-full text-center text-neutral-700 text-xs py-2 hover:text-red-500 transition-colors"
+        title="Double-click to clear all stats"
+      >
+        Double-click to reset
+      </button>
     </div>
   );
 }
