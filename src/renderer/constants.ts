@@ -81,56 +81,67 @@ export function isCustomValue(value: number, options: TimingOption[]): boolean {
   return !options.some(opt => opt.value === value);
 }
 
-// Short break quotes - gentle, quick reminders
+// Short break quotes - gentle, quick reminders including health tips
 export const COPIES: Copy[] = [
-  {
-    title: 'Refresh Your Vision',
-    subtitle: 'Take a moment to refocus and recharge.',
-  },
-  {
-    title: 'Relax Your Gaze',
-    subtitle: 'Let your eyes take a short vacation.',
-  },
-  {
-    title: 'Pause and Reflect',
-    subtitle: 'Rest your eyes, rejuvenate your mind.',
-  },
+  // Motivational
+  { title: 'Refresh Your Vision', subtitle: 'Take a moment to refocus and recharge.' },
+  { title: 'Relax Your Gaze', subtitle: 'Let your eyes take a short vacation.' },
+  { title: 'Pause and Reflect', subtitle: 'Rest your eyes, rejuvenate your mind.' },
   { title: 'Eyes on Break', subtitle: 'Time to give your eyes a breather.' },
-  { title: 'Lookout Lounge', subtitle: 'Lounge back, let your gaze wander.' },
-  {
-    title: 'Visual Timeout',
-    subtitle: 'Relaxation for your eyes, clarity for your mind.',
-  },
-  {
-    title: 'Look Away',
-    subtitle: 'Briefly divert your gaze for renewed focus.',
-  },
+  { title: 'Visual Timeout', subtitle: 'Relaxation for your eyes, clarity for your mind.' },
   { title: 'Blink Break', subtitle: 'Close your eyes, relax your mind.' },
   { title: 'Soothing Sight', subtitle: 'Ease the strain, enhance the view.' },
-  { title: 'Optical Oasis', subtitle: 'Escape the screen, embrace the calm.' },
   { title: 'Vision Vacation', subtitle: 'See the world anew.' },
   { title: 'Gaze Break', subtitle: 'Rest, reset, and return refreshed.' },
-  { title: 'Eyes Unwind', subtitle: 'Ease the tension, enhance the clarity.' },
   { title: 'Visual Respite', subtitle: 'Brief breaks for brighter views.' },
-  { title: 'Sight Serenity', subtitle: 'A moment of calm for clearer vision.' },
   { title: 'Focus Pause', subtitle: 'Step back, relax, regain focus.' },
-  { title: 'Eyes Ease', subtitle: 'Take a breather, ease the strain.' },
-  { title: 'Gaze Grace', subtitle: 'Give your eyes the grace they deserve.' },
+  // Eye exercises
+  { title: 'Look Away', subtitle: 'Focus on something 20 feet away for 20 seconds. Let your eye muscles relax.' },
+  { title: 'Slow Blinks', subtitle: 'Close your eyes gently for 2 seconds, then open. Repeat a few times to refresh your tear film.' },
+  { title: 'Eye Circles', subtitle: 'Roll your eyes slowly in a circle, clockwise then counter-clockwise. Keep your head still.' },
+  { title: 'Focus Shift', subtitle: 'Look at your thumb up close, then something distant. Alternate a few times.' },
+  // Neck and shoulders
+  { title: 'Neck Tilt', subtitle: 'Slowly tilt your head to the right, hold for a moment. Return to center. Repeat on the left.' },
+  { title: 'Shoulder Rolls', subtitle: 'Roll your shoulders forward a few times, then backward. Slow, controlled circles.' },
+  { title: 'Shoulder Shrug', subtitle: 'Raise your shoulders up towards your ears. Hold briefly. Drop them completely.' },
+  // Wrists
+  { title: 'Wrist Circles', subtitle: 'Extend your arms, make fists, and rotate your wrists in circles both directions.' },
+  { title: 'Finger Stretch', subtitle: 'Spread your fingers wide, hold. Make a fist, hold. Release the tension.' },
+  // Breathing
+  { title: 'Deep Breath', subtitle: 'Breathe in slowly through your nose. Hold briefly. Exhale slowly through your mouth.' },
+  { title: 'Belly Breathing', subtitle: 'Place hand on belly. Breathe deeply so your belly rises. Exhale slowly.' },
+  // Hydration
+  { title: 'Hydration Check', subtitle: 'When did you last drink water? Your body and eyes need it.' },
+  { title: 'Water Break', subtitle: 'Take a sip of water. Staying hydrated helps prevent dry eyes.' },
 ];
 
-// Long break quotes - warm, grateful, mindful (not demanding attention)
+// Long break quotes - warm, grateful, mindful with health tips
 export const LONG_BREAK_COPIES: Copy[] = [
+  // Mindfulness
   { title: 'Well Rested', subtitle: 'You showed up. That matters.' },
   { title: 'Breathe Deep', subtitle: 'This moment is yours. No rush.' },
   { title: 'Gentle Pause', subtitle: 'Thank your eyes for all they do.' },
   { title: 'Be Still', subtitle: 'Progress isn\'t always visible. Trust it.' },
   { title: 'Quiet Moment', subtitle: 'Let the world wait a little longer.' },
   { title: 'Soft Landing', subtitle: 'You\'ve been focused. Now just be.' },
-  { title: 'Kindness Break', subtitle: 'Be gentle with yourself today.' },
   { title: 'Present Moment', subtitle: 'Right here is exactly where you need to be.' },
-  { title: 'Rest Well', subtitle: 'Your effort is enough. Always.' },
   { title: 'Simply Be', subtitle: 'Nothing to fix. Nothing to prove.' },
   { title: 'Peaceful Pause', subtitle: 'Let your thoughts drift like clouds.' },
-  { title: 'Grateful Rest', subtitle: 'Small breaks, big difference.' },
+  // Stretches
+  { title: 'Stand and Stretch', subtitle: 'Stand up. Reach both arms overhead and stretch upward. Hold for a moment.' },
+  { title: 'Side Stretch', subtitle: 'Stand with feet hip-width. Raise one arm, lean to the opposite side. Hold, then switch.' },
+  { title: 'Chest Opener', subtitle: 'Clasp hands behind your back. Straighten arms, lift chest, squeeze shoulder blades together.' },
+  { title: 'Seated Twist', subtitle: 'Sit tall. Place one hand on the opposite knee, twist gently. Hold, then switch sides.' },
+  // Eye care
+  { title: 'Palm Your Eyes', subtitle: 'Rub your palms together to warm them. Gently cup them over your closed eyes. Breathe.' },
+  { title: 'Distance Gaze', subtitle: 'Look out a window at the farthest point you can see. Let your eyes fully relax.' },
+  // Breathing
+  { title: 'Box Breathing', subtitle: 'Inhale 4 seconds, hold 4 seconds, exhale 4 seconds, hold 4 seconds. Repeat.' },
+  { title: 'Calming Breath', subtitle: 'Close your eyes. Breathe in for 4, out for 6. Feel your body settle.' },
+  // Movement
+  { title: 'Walk Around', subtitle: 'Take a short walk. Even a few steps helps your circulation and clears your mind.' },
+  { title: 'Body Scan', subtitle: 'Close your eyes. Mentally scan from head to toes. Notice any tension. Breathe into it.' },
+  // Hydration
+  { title: 'Refill Time', subtitle: 'Good moment to refill your water. Your body works better when hydrated.' },
 ];
 

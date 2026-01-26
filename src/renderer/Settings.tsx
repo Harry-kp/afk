@@ -16,7 +16,13 @@ import {
   Check,
   RotateCcw,
   FileJson,
+  BarChart3,
+  Flame,
+  Target,
+  TrendingUp,
+  Trash2,
 } from 'lucide-react';
+import type { StatsResponse } from './lib/tauri-bridge';
 
 // X (Twitter) icon - custom SVG since lucide doesn't have the new X logo
 const XIcon = ({ className }: { className?: string }) => (
@@ -108,6 +114,156 @@ function ResetSettings() {
   );
 }
 
+// Helper functions for stats
+function formatTime(seconds: number): string {
+  if (seconds < 60) return `${seconds}s`;
+  const hours = Math.floor(seconds / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
+  if (hours > 0) {
+    return minutes > 0 ? `${hours}h ${minutes}m` : `${hours}h`;
+  }
+  return `${minutes}m`;
+}
+
+function getWeekdayShort(dateStr: string): string {
+  const date = new Date(dateStr);
+  return date.toLocaleDateString('en-US', { weekday: 'short' });
+}
+
+function StatsContent() {
+  const [stats, setStats] = useState<StatsResponse | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    loadStats();
+  }, []);
+
+  const loadStats = async () => {
+    const data = await window.electron.stats.getStats();
+    if (data) setStats(data);
+    setLoading(false);
+  };
+
+  const handleClearStats = async () => {
+    await window.electron.stats.clearStats();
+    track('stats_cleared');
+    loadStats();
+  };
+
+  if (loading) {
+    return <div className="text-center text-neutral-500 py-8">Loading...</div>;
+  }
+
+  if (!stats || stats.all_time.total_sessions === 0) {
+    return (
+      <div className="text-center py-8">
+        <BarChart3 className="w-12 h-12 text-neutral-600 mx-auto mb-4" />
+        <p className="text-neutral-400">No data yet</p>
+        <p className="text-neutral-500 text-sm mt-1">Start a session to track your progress</p>
+      </div>
+    );
+  }
+
+  const breakRate = (stats.today.breaks_taken + stats.today.breaks_skipped) > 0
+    ? Math.round((stats.today.breaks_taken / (stats.today.breaks_taken + stats.today.breaks_skipped)) * 100)
+    : 100;
+
+  return (
+    <div className="space-y-6">
+      {/* Today */}
+      <div className="bg-neutral-800/50 rounded-lg p-4">
+        <h3 className="text-sm font-medium text-neutral-400 mb-3">Today</h3>
+        <div className="grid grid-cols-3 gap-4 text-center">
+          <div>
+            <div className="text-2xl font-bold text-white">{formatTime(stats.today.total_focus_secs)}</div>
+            <div className="text-xs text-neutral-500">Focus Time</div>
+          </div>
+          <div>
+            <div className="text-2xl font-bold text-white">{stats.today.breaks_taken}</div>
+            <div className="text-xs text-neutral-500">Breaks Taken</div>
+          </div>
+          <div>
+            <div className="text-2xl font-bold text-white">{breakRate}%</div>
+            <div className="text-xs text-neutral-500">Break Rate</div>
+          </div>
+        </div>
+      </div>
+
+      {/* Streak */}
+      <div className="flex items-center gap-4 bg-neutral-800/50 rounded-lg p-4">
+        <Flame className="w-8 h-8 text-amber-500" />
+        <div>
+          <div className="text-xl font-bold text-white">{stats.streak.current} Day Streak</div>
+          <div className="text-xs text-neutral-500">Best: {stats.streak.longest} days</div>
+        </div>
+      </div>
+
+      {/* This Week */}
+      <div className="bg-neutral-800/50 rounded-lg p-4">
+        <h3 className="text-sm font-medium text-neutral-400 mb-3">This Week</h3>
+        <div className="flex items-end justify-between gap-1 h-16 mb-2">
+          {stats.weekly_trend.map((day, i) => {
+            const maxVal = Math.max(...stats.weekly_trend.map(d => d.total_focus_secs), 1);
+            const height = (day.total_focus_secs / maxVal) * 100;
+            const isToday = i === stats.weekly_trend.length - 1;
+            return (
+              <div key={day.date} className="flex flex-col items-center flex-1 gap-1">
+                <div
+                  className={`w-full rounded-t-sm ${isToday ? 'bg-amber-500' : day.total_focus_secs > 0 ? 'bg-neutral-600' : 'bg-neutral-700'}`}
+                  style={{ height: `${Math.max(height, 4)}%`, minHeight: '2px' }}
+                />
+                <span className={`text-[10px] ${isToday ? 'text-amber-400' : 'text-neutral-500'}`}>
+                  {getWeekdayShort(day.date)}
+                </span>
+              </div>
+            );
+          })}
+        </div>
+        <div className="text-center text-sm text-neutral-400">
+          {formatTime(stats.week.total_focus_secs)} total
+        </div>
+      </div>
+
+      {/* All Time */}
+      <div className="bg-neutral-800/50 rounded-lg p-4">
+        <h3 className="text-sm font-medium text-neutral-400 mb-3">All Time</h3>
+        <div className="grid grid-cols-2 gap-4">
+          <div className="flex items-center gap-3">
+            <Target className="w-5 h-5 text-neutral-500" />
+            <div>
+              <div className="text-lg font-semibold text-white">{stats.all_time.total_sessions}</div>
+              <div className="text-xs text-neutral-500">Sessions</div>
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
+            <TrendingUp className="w-5 h-5 text-neutral-500" />
+            <div>
+              <div className="text-lg font-semibold text-white">{formatTime(stats.all_time.total_focus_secs)}</div>
+              <div className="text-xs text-neutral-500">Focus Time</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Clear Stats */}
+      <div className="flex items-center justify-between pt-4 border-t border-neutral-800">
+        <div>
+          <div className="text-sm text-neutral-400">Clear all statistics</div>
+          <div className="text-xs text-neutral-500">Double-click to clear</div>
+        </div>
+        <button
+          type="button"
+          onDoubleClick={handleClearStats}
+          className="p-2 hover:bg-neutral-800 rounded-md transition-colors group"
+          title="Double-click to clear"
+        >
+          <Trash2 className="w-4 h-4 text-neutral-500 group-hover:text-red-500 transition-colors" />
+        </button>
+      </div>
+    </div>
+  );
+}
+
 function Settings({
   setShowSettings,
 }: {
@@ -127,6 +283,7 @@ function Settings({
             <TabsList className="justify-center">
               <TabsTrigger value="general">General</TabsTrigger>
               <TabsTrigger value="system">System</TabsTrigger>
+              <TabsTrigger value="stats">Stats</TabsTrigger>
               <TabsTrigger value="about">About</TabsTrigger>
             </TabsList>
             <TabsContent value="general">
@@ -190,6 +347,11 @@ function Settings({
               <div className="flex items-center gap-x-8 [&>div]:w-full">
                 <RotateCcw width={20} height={20} />
                 <ResetSettings />
+              </div>
+            </TabsContent>
+            <TabsContent value="stats">
+              <div className="pt-4 max-w-md mx-auto">
+                <StatsContent />
               </div>
             </TabsContent>
             <TabsContent value="about">

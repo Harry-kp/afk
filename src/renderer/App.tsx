@@ -3,12 +3,11 @@ import { listen } from '@tauri-apps/api/event';
 import Break from './Break';
 import Settings from './Settings';
 import Overview from './Overview';
-import Stats from './Stats';
 
 import './App.css';
 
 function ViewManager() {
-  const [currentView, setCurrentView] = useState<'dashboard' | 'settings' | 'stats'>('dashboard');
+  const [showSettings, setShowSettings] = useState(false);
   const [viewType, setViewType] = useState<string | null>(null);
   const [breakDuration, setBreakDuration] = useState<number>(30);
 
@@ -18,13 +17,10 @@ function ViewManager() {
     
     if (params.has('settings')) {
       setViewType('settings');
-      setCurrentView('settings');
+      setShowSettings(true);
     } else if (params.has('dashboard')) {
       setViewType('dashboard');
-      setCurrentView('dashboard');
-    } else if (params.has('stats')) {
-      setViewType('stats');
-      setCurrentView('stats');
+      setShowSettings(false);
     } else if (params.has('long-break')) {
       setViewType('long-break');
       const duration = params.get('duration');
@@ -43,11 +39,9 @@ function ViewManager() {
   useEffect(() => {
     const unlisten = listen<string>('navigate', (event) => {
       if (event.payload === 'settings') {
-        setCurrentView('settings');
+        setShowSettings(true);
       } else if (event.payload === 'dashboard') {
-        setCurrentView('dashboard');
-      } else if (event.payload === 'stats') {
-        setCurrentView('stats');
+        setShowSettings(false);
       }
     });
 
@@ -56,18 +50,11 @@ function ViewManager() {
     };
   }, []);
 
-  if (viewType === 'settings' || viewType === 'dashboard' || viewType === 'stats') {
-    if (currentView === 'settings') {
-      return <Settings setShowSettings={(show) => setCurrentView(show ? 'settings' : 'dashboard')} />;
-    }
-    if (currentView === 'stats') {
-      return <Stats onBack={() => setCurrentView('dashboard')} />;
-    }
-    return (
-      <Overview 
-        setShowSettings={(show) => setCurrentView(show ? 'settings' : 'dashboard')}
-        setShowStats={(show) => setCurrentView(show ? 'stats' : 'dashboard')}
-      />
+  if (viewType === 'settings' || viewType === 'dashboard') {
+    return showSettings ? (
+      <Settings setShowSettings={setShowSettings} />
+    ) : (
+      <Overview setShowSettings={setShowSettings} />
     );
   }
 
