@@ -21,7 +21,10 @@
     "autostart:allow-disable",
     "autostart:allow-is-enabled",
     "store:default",
-    "opener:default"
+    "opener:default",
+    "global-shortcut:default",
+    "global-shortcut:allow-register",
+    "global-shortcut:allow-unregister"
   ]
 }
 

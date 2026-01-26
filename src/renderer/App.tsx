@@ -3,11 +3,12 @@ import { listen } from '@tauri-apps/api/event';
 import Break from './Break';
 import Settings from './Settings';
 import Overview from './Overview';
+import Stats from './Stats';
 
 import './App.css';
 
 function ViewManager() {
-  const [showSettings, setShowSettings] = useState(false);
+  const [currentView, setCurrentView] = useState<'dashboard' | 'settings' | 'stats'>('dashboard');
   const [viewType, setViewType] = useState<string | null>(null);
   const [breakDuration, setBreakDuration] = useState<number>(30);
 
@@ -17,10 +18,13 @@ function ViewManager() {
     
     if (params.has('settings')) {
       setViewType('settings');
-      setShowSettings(true);
+      setCurrentView('settings');
     } else if (params.has('dashboard')) {
       setViewType('dashboard');
-      setShowSettings(false);
+      setCurrentView('dashboard');
+    } else if (params.has('stats')) {
+      setViewType('stats');
+      setCurrentView('stats');
     } else if (params.has('long-break')) {
       setViewType('long-break');
       const duration = params.get('duration');
@@ -39,9 +43,11 @@ function ViewManager() {
   useEffect(() => {
     const unlisten = listen<string>('navigate', (event) => {
       if (event.payload === 'settings') {
-        setShowSettings(true);
+        setCurrentView('settings');
       } else if (event.payload === 'dashboard') {
-        setShowSettings(false);
+        setCurrentView('dashboard');
+      } else if (event.payload === 'stats') {
+        setCurrentView('stats');
       }
     });
 
@@ -50,11 +56,18 @@ function ViewManager() {
     };
   }, []);
 
-  if (viewType === 'settings' || viewType === 'dashboard') {
-    return showSettings ? (
-      <Settings setShowSettings={setShowSettings} />
-    ) : (
-      <Overview setShowSettings={setShowSettings} />
+  if (viewType === 'settings' || viewType === 'dashboard' || viewType === 'stats') {
+    if (currentView === 'settings') {
+      return <Settings setShowSettings={(show) => setCurrentView(show ? 'settings' : 'dashboard')} />;
+    }
+    if (currentView === 'stats') {
+      return <Stats onBack={() => setCurrentView('dashboard')} />;
+    }
+    return (
+      <Overview 
+        setShowSettings={(show) => setCurrentView(show ? 'settings' : 'dashboard')}
+        setShowStats={(show) => setCurrentView(show ? 'stats' : 'dashboard')}
+      />
     );
   }
 

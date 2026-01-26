@@ -29,6 +29,57 @@ interface SessionState {
   short_break_count: number;
 }
 
+// Statistics types
+export interface DailyStats {
+  date: string;
+  total_focus_secs: number;
+  sessions_completed: number;
+  sessions_started: number;
+  breaks_taken: number;
+  breaks_skipped: number;
+  longest_session_secs: number;
+  first_session_at: string | null;
+  last_session_at: string | null;
+}
+
+export interface WeeklyStats {
+  total_focus_secs: number;
+  sessions_completed: number;
+  breaks_taken: number;
+  avg_daily_focus_secs: number;
+  most_productive_day: string | null;
+  most_productive_day_secs: number;
+}
+
+export interface StreakInfo {
+  current: number;
+  longest: number;
+  last_active_date: string | null;
+}
+
+export interface AllTimeStats {
+  total_focus_secs: number;
+  total_sessions: number;
+  total_breaks: number;
+  avg_session_secs: number;
+  started_at: string | null;
+}
+
+export interface HourlyBucket {
+  hour: number;
+  focus_secs: number;
+  sessions: number;
+}
+
+export interface StatsResponse {
+  today: DailyStats;
+  week: WeeklyStats;
+  streak: StreakInfo;
+  all_time: AllTimeStats;
+  hourly_distribution: HourlyBucket[];
+  weekly_trend: DailyStats[];
+}
+
 // Type for Tauri's global object
 declare global {
   interface Window {
@@ -200,6 +251,22 @@ const app = {
 };
 
 /**
+ * Statistics interface
+ */
+const stats = {
+  getStats: async (): Promise<StatsResponse | null> => {
+    return await safeInvoke<StatsResponse>('get_stats');
+  },
+  getTodayFocus: async (): Promise<number> => {
+    const result = await safeInvoke<number>('get_today_focus');
+    return result ?? 0;
+  },
+  clearStats: async (): Promise<void> => {
+    await safeInvoke('clear_stats');
+  },
+};
+
+/**
  * IPC renderer compatibility (for legacy code)
  */
 const ipcRenderer = {
@@ -255,6 +322,7 @@ export const electron = {
   session,
   autostart,
   app,
+  stats,
   ipcRenderer,
   on,
   removeAllListeners,

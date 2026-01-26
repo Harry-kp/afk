@@ -6,6 +6,7 @@ import {
   CirclePause,
   ChevronsRight,
   CircleStop,
+  BarChart3,
 } from 'lucide-react';
 import { track } from './lib/analytics';
 import { Button } from './components/ui/button';
@@ -57,8 +58,10 @@ interface SessionState {
 
 function Overview({
   setShowSettings,
+  setShowStats,
 }: {
   setShowSettings: (arg0: boolean) => void;
+  setShowStats?: (arg0: boolean) => void;
 }) {
   const [sessionState, setSessionState] = useState<SessionState | null>(null);
   const [displayTime, setDisplayTime] = useState<string>('');
@@ -340,6 +343,16 @@ function Overview({
             </SelectGroup>
           </SelectContent>
         </Select>
+        <Button
+          variant="link"
+          className="pl-0 ml-2"
+          onClick={() => {
+            track('show-stats-clicked');
+            setShowStats?.(true);
+          }}
+        >
+          Stats&nbsp; <BarChart3 width={20} height={20} />
+        </Button>
         <Button
           variant="link"
           className="pl-0 ml-2"

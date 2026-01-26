@@ -1,10 +1,12 @@
 import { useState, useEffect, useMemo } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { listen } from '@tauri-apps/api/event';
 import confetti from 'canvas-confetti';
+import { RefreshCw } from 'lucide-react';
 import { track } from './lib/analytics';
 import { AuroraBackground } from './components/ui/aurora-background';
 import { COPIES, LONG_BREAK_COPIES } from './constants';
+import { getRandomExercise, getCategoryName, type Exercise } from './exercises';
 
 function getTime(durationInSeconds: number) {
   const hours = Math.floor(durationInSeconds / 3600);
@@ -36,12 +38,29 @@ function Break({ isLongBreak, initialDuration }: { isLongBreak: boolean; initial
   const [seconds, setSeconds] = useState<number>(initialDuration);
   const [isClosing, setIsClosing] = useState(false);
   const [isFading, setIsFading] = useState(false);
+  const [exercise, setExercise] = useState<Exercise | null>(null);
+  const [shownExerciseIds, setShownExerciseIds] = useState<string[]>([]);
 
   // Select quote based on break type (memoized to stay consistent during break)
   const copy = useMemo(() => {
     const quotes = isLongBreak ? LONG_BREAK_COPIES : COPIES;
     return quotes[Math.floor(Math.random() * quotes.length)];
   }, [isLongBreak]);
+
+  // Get initial exercise
+  useEffect(() => {
+    const initialExercise = getRandomExercise(isLongBreak);
+    setExercise(initialExercise);
+    setShownExerciseIds([initialExercise.id]);
+  }, [isLongBreak]);
+
+  // Get a new exercise (for the refresh button)
+  const getNewExercise = () => {
+    const newExercise = getRandomExercise(isLongBreak, shownExerciseIds);
+    setExercise(newExercise);
+    setShownExerciseIds(prev => [...prev, newExercise.id]);
+    track('exercise_refreshed');
+  };
 
   // Listen for backend break-tick events (single source of truth)
   useEffect(() => {
@@ -167,7 +186,47 @@ function Break({ isLongBreak, initialDuration }: { isLongBreak: boolean; initial
         <div className="font-extralight text-base md:text-4xl text-neutral-200 py-4">
           {copy.subtitle}
         </div>
-        <div className="flex gap-4">
+
+        {/* Exercise Card */}
+        <AnimatePresence mode="wait">
+          {exercise && (
+            <motion.div
+              key={exercise.id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.3 }}
+              className="max-w-md w-full bg-white/10 backdrop-blur-md rounded-2xl p-5 mt-2 border border-white/20"
+            >
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="text-2xl">{exercise.icon}</span>
+                    <span className="text-xs font-medium text-white/60 uppercase tracking-wide">
+                      {getCategoryName(exercise.category)}
+                    </span>
+                  </div>
+                  <h3 className="text-xl font-semibold text-white mb-2">
+                    {exercise.title}
+                  </h3>
+                  <p className="text-white/80 text-sm leading-relaxed">
+                    {exercise.instruction}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={getNewExercise}
+                  className="p-2 hover:bg-white/10 rounded-full transition-colors flex-shrink-0"
+                  title="Try another exercise"
+                >
+                  <RefreshCw className="w-5 h-5 text-white/60 hover:text-white transition-colors" />
+                </button>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        <div className="flex gap-4 mt-4">
         <button
           type="button"
             className="bg-white rounded-full w-fit text-black px-4 py-2 hover:bg-gray-200 transition-colors disabled:opacity-50"

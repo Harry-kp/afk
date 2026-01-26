@@ -3,11 +3,14 @@
 
 mod commands;
 mod power_monitor;
+mod shortcuts;
 mod state;
+mod stats;
 mod tray;
 mod utils;
 
 use state::AppState;
+use stats::StatsManager;
 use tauri::{Manager, RunEvent};
 use tauri_plugin_notification::NotificationExt;
 
@@ -21,11 +24,16 @@ fn main() {
         ))
         .plugin(tauri_plugin_opener::init())
         .manage(AppState::new())
+        .manage(StatsManager::new())
         .setup(|app| {
             // Initialize settings persistence (load from disk)
             let state = app.state::<AppState>();
             if let Some(app_data_dir) = app.path().app_data_dir().ok() {
-                state.init_persistence(app_data_dir);
+                state.init_persistence(app_data_dir.clone());
+                
+                // Initialize stats persistence
+                let stats = app.state::<StatsManager>();
+                stats.init(app_data_dir);
             }
             
             // Initialize the system tray
@@ -33,6 +41,9 @@ fn main() {
             
             // Initialize power monitor (lock/unlock detection)
             power_monitor::init(app.handle().clone());
+            
+            // Initialize global keyboard shortcuts
+            shortcuts::register_shortcuts(app)?;
             
             // Request notification permission on macOS
             let _ = app.notification().request_permission();
@@ -63,6 +74,9 @@ fn main() {
             commands::add_time,
             commands::reset_settings,
             commands::get_config_path,
+            commands::get_stats,
+            commands::get_today_focus,
+            commands::clear_stats,
         ])
         .on_window_event(|window, event| {
             if let tauri::WindowEvent::CloseRequested { api, .. } = event {

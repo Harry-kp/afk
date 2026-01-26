@@ -1,4 +1,5 @@
 use crate::state::AppState;
+use crate::stats::{StatsManager, StatsResponse};
 use crate::tray;
 use crate::utils::{calculate_remaining_secs, now_iso, play_chime_for_event, ChimeEvent};
 use chrono::{Duration, Utc};
@@ -117,6 +118,10 @@ pub async fn set_setting<R: Runtime>(
 /// Start a new session (plays chime if enabled)
 #[tauri::command]
 pub async fn start_session<R: Runtime>(app: AppHandle<R>) -> Result<(), String> {
+    // Track stats - new session started
+    let stats = app.state::<StatsManager>();
+    stats.session_started();
+    
     play_chime_for_event(&app, ChimeEvent::SessionStart);
     start_session_internal(&app, None, false).await;
     Ok(())
@@ -252,6 +257,10 @@ async fn run_session_timer_loop<R: Runtime>(
             break;
         }
         
+        // Track focus time for stats
+        let stats = app_handle.state::<StatsManager>();
+        stats.tick_focus();
+        
         let state = app_handle.state::<AppState>();
         let session = state.get_session();
         
@@ -338,6 +347,10 @@ pub async fn pause_session<R: Runtime>(app: AppHandle<R>) -> Result<(), String> 
 pub async fn end_session<R: Runtime>(app: AppHandle<R>) -> Result<(), String> {
     let state = app.state::<AppState>();
     
+    // Track stats - session ended manually (not completed naturally)
+    let stats = app.state::<StatsManager>();
+    stats.session_ended(false);
+    
     // Close break windows if on break
     if state.is_on_break() {
         close_break_windows_internal(&app);
@@ -360,11 +373,17 @@ pub async fn end_session<R: Runtime>(app: AppHandle<R>) -> Result<(), String> {
 /// End the break and start a new session
 #[tauri::command]
 pub async fn end_break<R: Runtime>(app: AppHandle<R>) -> Result<(), String> {
+    // Track stats - break completed (session ended naturally)
+    let stats = app.state::<StatsManager>();
+    stats.session_ended(true);
+    stats.break_completed();
+    
     // Close break windows first
     close_break_windows_internal(&app);
     
-    // Start new session (chime for break end)
+    // Start new session (chime for break end) - this starts a NEW session
     play_chime_for_event(&app, ChimeEvent::BreakEnd);
+    stats.session_started();
     start_session_internal(&app, None, false).await;
     
     Ok(())
@@ -376,10 +395,16 @@ pub async fn skip_break<R: Runtime>(app: AppHandle<R>) -> Result<(), String> {
     let state = app.state::<AppState>();
     let session_duration = state.get_setting_u64("session_duration");
     
+    // Track stats - break skipped
+    let stats = app.state::<StatsManager>();
+    stats.session_ended(true);  // Session completed naturally (timer ran out)
+    stats.break_skipped();
+    
     // Close break windows first (cancels break timer)
     close_break_windows_internal(&app);
     
-    // Then start new session (no chime for skip)
+    // Then start new session (no chime for skip) - this starts a NEW session
+    stats.session_started();
     start_session_internal(&app, Some(session_duration), false).await;
     
     Ok(())
@@ -388,10 +413,16 @@ pub async fn skip_break<R: Runtime>(app: AppHandle<R>) -> Result<(), String> {
 /// Snooze the break for 5 minutes
 #[tauri::command]
 pub async fn snooze_break<R: Runtime>(app: AppHandle<R>) -> Result<(), String> {
+    // Track stats - break skipped (snoozed counts as skipped)
+    let stats = app.state::<StatsManager>();
+    stats.session_ended(true);
+    stats.break_skipped();
+    
     // Close break windows
     close_break_windows_internal(&app);
     
-    // Start a 5-minute session (no chime)
+    // Start a 5-minute session (no chime) - this is a new mini-session
+    stats.session_started();
     start_session_internal(&app, Some(300), false).await;
     
     Ok(())
@@ -649,4 +680,27 @@ pub async fn reset_settings(state: State<'_, AppState>) -> Result<(), String> {
 pub async fn get_config_path(state: State<'_, AppState>) -> Result<String, String> {
     state.get_settings_path()
         .ok_or_else(|| "Config path not initialized".to_string())
+}
+
+// =============================================================================
+// Statistics Commands
+// =============================================================================
+
+/// Get complete statistics for the dashboard
+#[tauri::command]
+pub async fn get_stats(stats: State<'_, StatsManager>) -> Result<StatsResponse, String> {
+    Ok(stats.get_stats())
+}
+
+/// Get today's focus time in seconds (for live display in menu bar)
+#[tauri::command]
+pub async fn get_today_focus(stats: State<'_, StatsManager>) -> Result<u64, String> {
+    Ok(stats.get_today_focus_secs())
+}
+
+/// Clear all statistics
+#[tauri::command]
+pub async fn clear_stats(stats: State<'_, StatsManager>) -> Result<(), String> {
+    stats.clear_all();
+    Ok(())
 }
