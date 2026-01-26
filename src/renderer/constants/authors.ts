@@ -24,7 +24,7 @@ export const AUTHORS = {
 
 export const APP_INFO = {
   name: 'AFK',
-  version: '1.0.0',
+  version: '1.1.0',
   tagline: 'Step away from your keyboard',
   description: 'A break reminder for developers who forget to blink.',
   website: 'https://afk-app.vercel.app',

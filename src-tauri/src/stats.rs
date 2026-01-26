@@ -354,7 +354,7 @@ impl StatsManager {
         for (date, stats) in daily.iter() {
             all_time.total_focus_secs += stats.total_focus_secs;
             all_time.total_sessions += stats.sessions_started;
-            all_time.total_breaks += stats.breaks_taken;
+            all_time.total_breaks += stats.breaks_taken + stats.breaks_skipped;
 
             if earliest_date.is_none() || date < earliest_date.as_ref().unwrap() {
                 earliest_date = Some(date.clone());

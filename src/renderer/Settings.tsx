@@ -8,7 +8,6 @@ import {
   ArrowLeft,
   TimerReset,
   Volume2,
-  Heart,
   Globe,
   Share2,
   ExternalLink,
@@ -16,11 +15,8 @@ import {
   Check,
   RotateCcw,
   FileJson,
-  BarChart3,
   Flame,
-  Target,
-  TrendingUp,
-  Trash2,
+  Keyboard,
 } from 'lucide-react';
 import type { StatsResponse } from './lib/tauri-bridge';
 
@@ -110,6 +106,37 @@ function ResetSettings() {
       >
         <RotateCcw className="w-4 h-4 text-muted-foreground group-hover:text-yellow-500 group-active:text-red-500 group-active:rotate-180 transition-all duration-300" />
       </button>
+    </div>
+  );
+}
+
+// Keyboard shortcut display
+const SHORTCUTS = [
+  { keys: '⌘ ⇧ N', action: 'Start / End session' },
+  { keys: '⌘ ⇧ P', action: 'Pause / Resume' },
+  { keys: '⌘ ⇧ B', action: 'Take / End break' },
+  { keys: '⌘ ⇧ S', action: 'Skip break' },
+];
+
+function KeyboardShortcuts() {
+  return (
+    <div className="w-full">
+      <Label className="flex flex-col space-y-1 mb-3">
+        <span>Keyboard shortcuts</span>
+        <span className="font-normal text-muted-foreground text-xs">
+          Global hotkeys work even when AFK is in background
+        </span>
+      </Label>
+      <div className="space-y-2">
+        {SHORTCUTS.map((shortcut) => (
+          <div key={shortcut.keys} className="flex items-center justify-between">
+            <span className="text-sm text-neutral-400">{shortcut.action}</span>
+            <kbd className="px-2 py-1 text-xs font-mono bg-neutral-800 text-neutral-300 rounded border border-neutral-700">
+              {shortcut.keys}
+            </kbd>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
@@ -347,6 +374,13 @@ function Settings({
               <div className="flex items-center gap-x-8 [&>div]:w-full">
                 <RotateCcw width={20} height={20} />
                 <ResetSettings />
+              </div>
+              <div className="pt-4" />
+              <Separator className="my-4" />
+              <div className="pt-4" />
+              <div className="flex items-start gap-x-8 [&>div]:w-full">
+                <Keyboard width={20} height={20} className="mt-1" />
+                <KeyboardShortcuts />
               </div>
             </TabsContent>
             <TabsContent value="stats">

@@ -12,6 +12,7 @@ mod utils;
 use state::AppState;
 use stats::StatsManager;
 use tauri::{Manager, RunEvent};
+use tauri_plugin_global_shortcut::ShortcutState;
 use tauri_plugin_notification::NotificationExt;
 
 fn main() {
@@ -23,6 +24,20 @@ fn main() {
             Some(vec![]),
         ))
         .plugin(tauri_plugin_opener::init())
+        .plugin(
+            tauri_plugin_global_shortcut::Builder::new()
+                .with_handler(|app, shortcut, event| {
+                    if event.state() != ShortcutState::Pressed {
+                        return;
+                    }
+                    let app_handle = app.clone();
+                    let shortcut_str = shortcut.to_string();
+                    tauri::async_runtime::spawn(async move {
+                        shortcuts::handle_shortcut(&app_handle, &shortcut_str).await;
+                    });
+                })
+                .build(),
+        )
         .manage(AppState::new())
         .manage(StatsManager::new())
         .setup(|app| {
