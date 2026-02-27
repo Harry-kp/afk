@@ -1,11 +1,19 @@
 <p align="center">
-  <img src="landing/assets/icon.png" alt="AFK" width="120" height="120">
+  <img src="https://raw.githubusercontent.com/Harry-kp/afk/main/landing/assets/icon.png" alt="AFK" width="120" height="120">
 </p>
 
 <h1 align="center">AFK</h1>
 
 <p align="center">
   <strong>A break reminder for developers who forget to blink.</strong>
+</p>
+
+<p align="center">
+  <a href="https://github.com/Harry-kp/afk/actions/workflows/release.yml"><img src="https://github.com/Harry-kp/afk/actions/workflows/release.yml/badge.svg" alt="Release"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="License: MIT"></a>
+  <a href="https://github.com/Harry-kp/afk-releases/releases/latest"><img src="https://img.shields.io/github/v/release/Harry-kp/afk-releases?label=download" alt="Latest Release"></a>
+  <a href="https://github.com/Harry-kp/afk"><img src="https://img.shields.io/github/stars/Harry-kp/afk?style=social" alt="GitHub Stars"></a>
+  <a href="CONTRIBUTING.md"><img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg" alt="PRs Welcome"></a>
 </p>
 
 <p align="center">
@@ -16,26 +24,66 @@
 
 ---
 
-AFK is a lightweight break reminder that lives in your menu bar. It follows the 20-20-20 rule: every 20 minutes, look at something 20 feet away for 20 seconds. Simple, unobtrusive, effective.
+AFK is a lightweight break reminder that lives in your menu bar. It follows the **20-20-20 rule**: every 20 minutes, look at something 20 feet away for 20 seconds. Simple, unobtrusive, effective.
 
 <p align="center">
-  <img src="landing/assets/demo.gif" alt="AFK Demo" width="600">
+  <a href="https://afk-app.vercel.app">
+    <img src="https://raw.githubusercontent.com/Harry-kp/afk/main/landing/assets/demo.gif" alt="AFK Demo" width="600">
+  </a>
 </p>
+
+## Why AFK?
+
+It was 2 AM. Four hours deep into debugging. Eyes burning, neck stiff, hadn't blinked in what felt like forever.
+
+Most break reminders are either too aggressive (popup every 5 minutes) or too easy to ignore (a tiny notification you dismiss without thinking). AFK strikes a balance: a fullscreen reminder you can't miss, but with skip/snooze options when you're in flow. No guilt trips, no gamification — just a simple tool that does one thing well.
+
+### AFK vs Alternatives
+
+| Feature | AFK | Stretchly | Time Out | Pomatez |
+|---------|:---:|:---------:|:--------:|:-------:|
+| Open source | ✅ | ✅ | ❌ | ✅ |
+| Fullscreen breaks | ✅ | ✅ | ✅ | ❌ |
+| Menu bar timer | ✅ | ✅ | ❌ | ❌ |
+| Statistics dashboard | ✅ | ❌ | ❌ | ❌ |
+| Health exercises | ✅ | ✅ | ❌ | ❌ |
+| Global shortcuts | ✅ | ✅ | ❌ | ❌ |
+| App size | < 5 MB | ~200 MB | ~15 MB | ~100 MB |
+| Built with | Rust + Tauri | Electron | Native | Electron |
+| macOS | ✅ | ✅ | ✅ | ✅ |
+| Linux | ✅ | ✅ | ❌ | ✅ |
+| Windows | 🔜 | ✅ | ❌ | ✅ |
 
 ## Install
 
-**Homebrew (recommended)**
+**macOS — Homebrew (recommended)**
 
 ```bash
 brew tap Harry-kp/tap
 brew install --cask afk
 ```
 
-**Direct Download**
+**macOS — Direct Download**
 
 Download the latest `.dmg` from [releases](https://github.com/Harry-kp/afk-releases/releases/latest).
 
 > First launch: Right-click → Open → Open (required for apps outside the App Store)
+
+**Linux — AppImage**
+
+Download the `.AppImage` from [releases](https://github.com/Harry-kp/afk-releases/releases/latest), then:
+
+```bash
+chmod +x Afk_*.AppImage
+./Afk_*.AppImage
+```
+
+**Linux — Debian/Ubuntu**
+
+```bash
+# Download the .deb from releases, then:
+sudo dpkg -i afk_*.deb
+```
 
 ## Features
 
@@ -50,9 +98,15 @@ Download the latest `.dmg` from [releases](https://github.com/Harry-kp/afk-relea
 - **Launch at login** — Set it and forget it
 - **No account required** — Your data stays on your machine
 
-## Why AFK?
+## Roadmap
 
-Most break reminders are either too aggressive or too easy to ignore. AFK strikes a balance: a fullscreen reminder you can't miss, but with skip/snooze options when you're in flow. No guilt trips, no gamification—just a simple tool that does one thing well.
+- [x] Linux support (AppImage + .deb)
+- [ ] Windows support
+- [ ] Customizable break screen themes
+- [ ] Plugin system for custom exercises
+- [ ] CLI mode for headless/SSH sessions
+
+Have an idea? [Open a discussion](https://github.com/Harry-kp/afk/discussions).
 
 ## Development
 
@@ -89,6 +143,10 @@ Contributions welcome. See [CONTRIBUTING.md](CONTRIBUTING.md).
 ## License
 
 MIT — see [LICENSE](LICENSE).
+
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=Harry-kp/afk&type=Date)](https://star-history.com/#Harry-kp/afk&Date)
 
 ---
 
