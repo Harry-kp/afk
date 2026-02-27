@@ -56,9 +56,9 @@ jobs:
             ```
 
             ### Direct Download
-            Download the DMG below for your architecture.
+            Download the DMG (macOS) or AppImage/deb (Linux) below.
 
-            **First launch:** Right-click the app → Open → Open
+            **macOS first launch:** Right-click the app → Open → Open
             (Required for apps outside the App Store)
           releaseDraft: true
           prerelease: false
@@ -91,3 +91,74 @@ jobs:
           GH_TOKEN: ${{ secrets.HOMEBREW_TAP_TOKEN }}
         run: |
           gh workflow run update-homebrew.yml --repo Harry-kp/homebrew-tap
+
+  build-linux:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install Rust stable
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Rust cache
+        uses: swatinem/rust-cache@v2
+        with:
+          workspaces: './src-tauri -> target'
+
+      - name: Install Linux dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libwebkit2gtk-4.1-dev \
+            libappindicator3-dev \
+            librsvg2-dev \
+            patchelf \
+            libgtk-3-dev \
+            libsoup-3.0-dev \
+            libjavascriptcoregtk-4.1-dev \
+            libasound2-dev
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build Tauri app
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tagName: v__VERSION__
+          releaseName: 'Afk v__VERSION__'
+          releaseBody: ''
+          releaseDraft: true
+          prerelease: false
+
+      - name: Get version from tag
+        id: get_version
+        run: |
+          VERSION=${GITHUB_REF#refs/tags/v}
+          echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Upload Linux artifacts to releases repo
+        env:
+          GH_TOKEN: ${{ secrets.RELEASES_REPO_TOKEN }}
+        run: |
+          VERSION=${{ steps.get_version.outputs.VERSION }}
+          APPIMAGE_PATH=$(find src-tauri/target/release/bundle/appimage -name "*.AppImage" | head -1)
+          DEB_PATH=$(find src-tauri/target/release/bundle/deb -name "*.deb" | head -1)
+          
+          if [ -n "$APPIMAGE_PATH" ]; then
+            gh release upload "v${VERSION}" "$APPIMAGE_PATH" --repo Harry-kp/afk-releases --clobber
+            echo "✅ Uploaded AppImage"
+          fi
+          
+          if [ -n "$DEB_PATH" ]; then
+            gh release upload "v${VERSION}" "$DEB_PATH" --repo Harry-kp/afk-releases --clobber
+            echo "✅ Uploaded .deb"
+          fi
