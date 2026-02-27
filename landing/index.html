@@ -137,8 +137,8 @@
             playsinline
             poster="assets/screenshot.png"
           >
-            <source src="https://github.com/Harry-kp/afk-releases/releases/download/v1.0.0/demo.webm" type="video/webm">
-            <source src="https://github.com/Harry-kp/afk-releases/releases/download/v1.0.0/demo.mp4" type="video/mp4">
+            <source src="https://github.com/Harry-kp/afk/releases/download/v1.0.0/demo.webm" type="video/webm">
+            <source src="https://github.com/Harry-kp/afk/releases/download/v1.0.0/demo.mp4" type="video/mp4">
             <img src="assets/screenshot.png" alt="AFK Screenshot">
           </video>
         </div>
@@ -400,7 +400,7 @@
     }
 
     // Fetch latest version
-    fetch('https://api.github.com/repos/Harry-kp/afk-releases/releases/latest')
+    fetch('https://api.github.com/repos/Harry-kp/afk/releases/latest')
       .then(res => res.json())
       .then(data => {
         if (data.tag_name) {
