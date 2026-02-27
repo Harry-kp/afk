@@ -57,8 +57,5 @@ After deploying to Vercel:
 
 ## Updating the Version
 
-When releasing a new version, update:
-
-1. The `v1.0.0` in `index.html` footer
-2. The Homebrew cask formula in `homebrew-tap/Casks/afk.rb`
+Both are automated on release — the version in `index.html` is fetched from the GitHub API at runtime, and the Homebrew cask is updated by the `update-homebrew.yml` workflow.
 
