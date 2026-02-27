@@ -11,14 +11,14 @@
 <p align="center">
   <a href="https://github.com/Harry-kp/afk/actions/workflows/release.yml"><img src="https://github.com/Harry-kp/afk/actions/workflows/release.yml/badge.svg" alt="Release"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="License: MIT"></a>
-  <a href="https://github.com/Harry-kp/afk-releases/releases/latest"><img src="https://img.shields.io/github/v/release/Harry-kp/afk-releases?label=download" alt="Latest Release"></a>
+  <a href="https://github.com/Harry-kp/afk/releases/latest"><img src="https://img.shields.io/github/v/release/Harry-kp/afk?label=download" alt="Latest Release"></a>
   <a href="https://github.com/Harry-kp/afk"><img src="https://img.shields.io/github/stars/Harry-kp/afk?style=social" alt="GitHub Stars"></a>
   <a href="CONTRIBUTING.md"><img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg" alt="PRs Welcome"></a>
 </p>
 
 <p align="center">
   <a href="https://afk-app.vercel.app">Website</a> •
-  <a href="https://github.com/Harry-kp/afk-releases/releases/latest">Download</a> •
+  <a href="https://github.com/Harry-kp/afk/releases/latest">Download</a> •
   <a href="#install">Install</a>
 </p>
 
@@ -65,13 +65,13 @@ brew install --cask afk
 
 **macOS — Direct Download**
 
-Download the latest `.dmg` from [releases](https://github.com/Harry-kp/afk-releases/releases/latest).
+Download the latest `.dmg` from [releases](https://github.com/Harry-kp/afk/releases/latest).
 
 > First launch: Right-click → Open → Open (required for apps outside the App Store)
 
 **Linux — AppImage**
 
-Download the `.AppImage` from [releases](https://github.com/Harry-kp/afk-releases/releases/latest), then:
+Download the `.AppImage` from [releases](https://github.com/Harry-kp/afk/releases/latest), then:
 
 ```bash
 chmod +x Afk_*.AppImage

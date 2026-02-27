@@ -64,28 +64,6 @@ jobs:
           prerelease: false
           args: --target universal-apple-darwin
 
-      - name: Get version from tag
-        id: get_version
-        run: |
-          VERSION=${GITHUB_REF#refs/tags/v}
-          echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
-
-      - name: Upload to public releases repo
-        env:
-          GH_TOKEN: ${{ secrets.RELEASES_REPO_TOKEN }}
-        run: |
-          VERSION=${{ steps.get_version.outputs.VERSION }}
-          DMG_PATH="src-tauri/target/universal-apple-darwin/release/bundle/dmg/Afk_${VERSION}_universal.dmg"
-          
-          # Create release in public repo
-          gh release create "v${VERSION}" \
-            --repo Harry-kp/afk-releases \
-            --title "Afk v${VERSION}" \
-            --notes "Release v${VERSION} - Download for macOS" \
-            "$DMG_PATH"
-          
-          echo "✅ Uploaded to afk-releases repo"
-
       - name: Trigger Homebrew cask update
         env:
           GH_TOKEN: ${{ secrets.HOMEBREW_TAP_TOKEN }}
@@ -138,27 +116,3 @@ jobs:
           releaseBody: ''
           releaseDraft: true
           prerelease: false
-
-      - name: Get version from tag
-        id: get_version
-        run: |
-          VERSION=${GITHUB_REF#refs/tags/v}
-          echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
-
-      - name: Upload Linux artifacts to releases repo
-        env:
-          GH_TOKEN: ${{ secrets.RELEASES_REPO_TOKEN }}
-        run: |
-          VERSION=${{ steps.get_version.outputs.VERSION }}
-          APPIMAGE_PATH=$(find src-tauri/target/release/bundle/appimage -name "*.AppImage" | head -1)
-          DEB_PATH=$(find src-tauri/target/release/bundle/deb -name "*.deb" | head -1)
-          
-          if [ -n "$APPIMAGE_PATH" ]; then
-            gh release upload "v${VERSION}" "$APPIMAGE_PATH" --repo Harry-kp/afk-releases --clobber
-            echo "✅ Uploaded AppImage"
-          fi
-          
-          if [ -n "$DEB_PATH" ]; then
-            gh release upload "v${VERSION}" "$DEB_PATH" --repo Harry-kp/afk-releases --clobber
-            echo "✅ Uploaded .deb"
-          fi
