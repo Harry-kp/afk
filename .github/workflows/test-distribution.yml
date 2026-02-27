@@ -20,7 +20,7 @@ jobs:
       - name: Get latest release info
         id: release
         run: |
-          RELEASE=$(curl -s https://api.github.com/repos/Harry-kp/afk-releases/releases/latest)
+          RELEASE=$(curl -s https://api.github.com/repos/Harry-kp/afk/releases/latest)
           VERSION=$(echo "$RELEASE" | jq -r '.tag_name')
           DMG_URL=$(echo "$RELEASE" | jq -r '.assets[] | select(.name | endswith(".dmg")) | .browser_download_url')
           
@@ -147,7 +147,7 @@ jobs:
           echo "🔗 Verifying download API is accessible..."
           
           # Test the GitHub API that the landing page uses
-          RELEASE=$(curl -s https://api.github.com/repos/Harry-kp/afk-releases/releases/latest)
+          RELEASE=$(curl -s https://api.github.com/repos/Harry-kp/afk/releases/latest)
           
           if echo "$RELEASE" | jq -e '.tag_name' > /dev/null 2>&1; then
             VERSION=$(echo "$RELEASE" | jq -r '.tag_name')

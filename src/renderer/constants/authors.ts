@@ -28,7 +28,7 @@ export const APP_INFO = {
   tagline: 'Step away from your keyboard',
   description: 'A break reminder for developers who forget to blink.',
   website: 'https://afk-app.vercel.app',
-  releases: 'https://github.com/Harry-kp/afk-releases/releases/latest',
+  releases: 'https://github.com/Harry-kp/afk/releases/latest',
   copyright: '© 2024-2026 All rights reserved',
 } as const;
 
