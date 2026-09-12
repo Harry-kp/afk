@@ -72,7 +72,11 @@ brew install --cask afk
 
 Download the latest `.dmg` from [releases](https://github.com/Harry-kp/afk/releases/latest).
 
-> First launch: Right-click → Open → Open (required for apps outside the App Store)
+> **First launch on macOS.** The app is not yet notarized, so macOS shows
+> *"Afk is damaged and can't be opened."* The Control-click bypass was removed
+> in macOS Sequoia, so open **System Settings → Privacy & Security**, scroll to
+> Security, and click **Open Anyway** next to AFK, then confirm. Notarized
+> builds are planned, which will remove this step entirely.
 
 **Linux — AppImage**
 
