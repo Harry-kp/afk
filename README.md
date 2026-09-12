@@ -12,7 +12,6 @@
   <a href="https://github.com/Harry-kp/afk/actions/workflows/release.yml"><img src="https://github.com/Harry-kp/afk/actions/workflows/release.yml/badge.svg" alt="Release"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="License: MIT"></a>
   <a href="https://github.com/Harry-kp/afk/releases/latest"><img src="https://img.shields.io/github/v/release/Harry-kp/afk?label=download" alt="Latest Release"></a>
-  <a href="https://github.com/Harry-kp/afk"><img src="https://img.shields.io/github/stars/Harry-kp/afk?style=social" alt="GitHub Stars"></a>
   <a href="CONTRIBUTING.md"><img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg" alt="PRs Welcome"></a>
 </p>
 
@@ -48,11 +47,17 @@ Most break reminders are either too aggressive (popup every 5 minutes) or too ea
 | Statistics dashboard | ✅ | ❌ | ❌ | ❌ |
 | Health exercises | ✅ | ✅ | ❌ | ❌ |
 | Global shortcuts | ✅ | ✅ | ❌ | ❌ |
-| App size | < 5 MB | ~200 MB | ~15 MB | ~100 MB |
+| Download size | **2.8 MB** (.deb/.rpm) · 5.5 MB (.dmg) | ~200 MB | ~15 MB | ~100 MB |
 | Built with | Rust + Tauri | Electron | Native | Electron |
 | macOS | ✅ | ✅ | ✅ | ✅ |
 | Linux | ✅ | ✅ | ❌ | ✅ |
 | Windows | 🔜 | ✅ | ❌ | ✅ |
+
+<sub>Sizes are the published release artifacts. The Linux AppImage is 77 MB because AppImage bundles its own runtime — the `.deb`/`.rpm` are the like-for-like comparison.</sub>
+
+> **Project status** — AFK works and is maintained as needed, but it is not under
+> active development. The latest release is v1.1.0 (February 2026). Issues and pull
+> requests are welcome; replies may be slow.
 
 ## Install
 
@@ -83,6 +88,13 @@ chmod +x Afk_*.AppImage
 ```bash
 # Download the .deb from releases, then:
 sudo dpkg -i afk_*.deb
+```
+
+**Linux — Fedora/RHEL**
+
+```bash
+# Download the .rpm from releases, then:
+sudo rpm -i Afk-*.x86_64.rpm
 ```
 
 ## Features
@@ -144,9 +156,6 @@ Contributions welcome. See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 MIT — see [LICENSE](LICENSE).
 
-## Star History
-
-[![Star History Chart](https://api.star-history.com/svg?repos=Harry-kp/afk&type=Date)](https://star-history.com/#Harry-kp/afk&Date)
 
 ---
 
