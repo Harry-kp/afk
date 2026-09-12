@@ -31,6 +31,14 @@ AFK is a lightweight break reminder that lives in your menu bar. It follows the 
   </a>
 </p>
 
+<p align="center">
+  <img src="https://raw.githubusercontent.com/Harry-kp/afk/main/landing/assets/break.png" alt="AFK break screen" width="600">
+</p>
+
+<p align="center">
+  <sub>When a break lands, it takes the whole screen — but <strong>Skip</strong> and <strong>Snooze</strong> are always right there.<br>It interrupts you; it doesn't trap you.</sub>
+</p>
+
 ## Why AFK?
 
 It was 2 AM. Four hours deep into debugging. Eyes burning, neck stiff, hadn't blinked in what felt like forever.
