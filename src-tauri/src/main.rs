@@ -17,7 +17,6 @@ use tauri_plugin_notification::NotificationExt;
 
 fn main() {
     let app = tauri::Builder::default()
-        .plugin(tauri_plugin_store::Builder::new().build())
         .plugin(tauri_plugin_notification::init())
         .plugin(tauri_plugin_autostart::init(
             tauri_plugin_autostart::MacosLauncher::LaunchAgent,
@@ -85,12 +84,10 @@ fn main() {
             commands::skip_break,
             commands::snooze_break,
             commands::take_break_now,
-            commands::close_break_windows,
             commands::add_time,
             commands::reset_settings,
             commands::get_config_path,
             commands::get_stats,
-            commands::get_today_focus,
             commands::clear_stats,
         ])
         .on_window_event(|window, event| {

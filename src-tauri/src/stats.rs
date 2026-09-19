@@ -292,16 +292,6 @@ impl StatsManager {
         }
     }
 
-    pub fn get_today_focus_secs(&self) -> u64 {
-        let today_str = Local::now().format("%Y-%m-%d").to_string();
-        
-        let daily = self.daily_stats.lock();
-        let saved = daily.get(&today_str).map(|s| s.total_focus_secs).unwrap_or(0);
-        let unsaved = *self.unsaved_focus_secs.lock();
-        
-        saved + unsaved
-    }
-
     pub fn clear_all(&self) {
         *self.daily_stats.lock() = HashMap::new();
         *self.streak.lock() = StreakInfo::default();

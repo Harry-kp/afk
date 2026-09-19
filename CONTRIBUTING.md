@@ -96,19 +96,11 @@ afk/
    - Screenshots for UI changes
    - Link to related issues
 
-## Testing
-
-### Frontend
+## Checks
 
 ```bash
-npm run test
-```
-
-### Backend (Rust)
-
-```bash
-cd src-tauri
-cargo test
+npm run lint
+cd src-tauri && cargo check
 ```
 
 ## Reporting Issues

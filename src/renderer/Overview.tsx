@@ -20,39 +20,17 @@ import {
 import { useToast } from './components/ui/use-toast';
 import { Toaster } from './components/ui/toaster';
 import { SESSION_DURATION_OPTIONS, SHORT_BREAK_OPTIONS, formatDuration, isCustomValue } from './constants';
+import type { SessionState } from './lib/tauri-bridge';
 
 export function getReadableTime(durationInSeconds: number) {
+  const part = (value: number, unit: string) =>
+    value > 0 ? `${String(value).padStart(2, '0')}${unit}` : '';
+
   const hours = Math.floor(durationInSeconds / 3600);
   const minutes = Math.floor((durationInSeconds % 3600) / 60);
   const seconds = durationInSeconds % 60;
 
-  let result = '';
-
-  const formattedHours = hours.toString().padStart(2, '0');
-  const formattedMinutes = minutes.toString().padStart(2, '0');
-  const formattedSeconds = seconds.toString().padStart(2, '0');
-
-  if (hours > 0) {
-    result += `${formattedHours}h`;
-  }
-
-  if (minutes > 0) {
-    result += `${formattedMinutes}m`;
-  }
-
-  if (seconds > 0) {
-    result += `${formattedSeconds}s`;
-  }
-
-  return result || '00s';
-}
-
-interface SessionState {
-  is_active: boolean;
-  is_paused: boolean;
-  end_time: string | null;
-  remaining_secs: number;
-  short_break_count: number;
+  return part(hours, 'h') + part(minutes, 'm') + part(seconds, 's') || '00s';
 }
 
 function Overview({

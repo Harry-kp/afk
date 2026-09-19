@@ -31,9 +31,9 @@ sed -i '' "s/^version = \".*\"/version = \"$NEW_VERSION\"/" "$ROOT_DIR/src-tauri
 echo "  → tauri.conf.json"
 sed -i '' "s/\"version\": \".*\"/\"version\": \"$NEW_VERSION\"/" "$ROOT_DIR/src-tauri/tauri.conf.json"
 
-# landing/constants.js
-echo "  → landing/constants.js"
-sed -i '' "s/version: '.*'/version: '$NEW_VERSION'/" "$ROOT_DIR/landing/constants.js"
+# landing/index.html
+echo "  → landing/index.html"
+sed -i '' "s|id=\"version\">v.*<|id=\"version\">v$NEW_VERSION<|" "$ROOT_DIR/landing/index.html"
 
 # src/renderer/constants/authors.ts
 echo "  → constants/authors.ts"
@@ -53,7 +53,7 @@ echo "  - package-lock.json"
 echo "  - src-tauri/Cargo.toml"
 echo "  - src-tauri/Cargo.lock"
 echo "  - src-tauri/tauri.conf.json"
-echo "  - landing/constants.js"
+echo "  - landing/index.html"
 echo "  - src/renderer/constants/authors.ts"
 echo ""
 echo "Next steps:"
