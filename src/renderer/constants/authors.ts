@@ -20,7 +20,7 @@ export const AUTHORS = {
 
 export const APP_INFO = {
   name: 'AFK',
-  version: '1.1.0',
+  version: '1.1.1',
   tagline: 'Step away from your keyboard',
   website: 'https://afk-app.vercel.app',
   copyright: '© 2024-2026 All rights reserved',

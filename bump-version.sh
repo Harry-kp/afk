@@ -2,7 +2,7 @@
 # =============================================================================
 # Version Bump Script
 # Updates version across all config files
-# Usage: ./scripts/bump-version.sh 1.2.0
+# Usage: ./bump-version.sh 1.2.0
 # =============================================================================
 
 set -e
@@ -14,7 +14,7 @@ if [ -z "$1" ]; then
 fi
 
 NEW_VERSION="$1"
-ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
+ROOT_DIR="$(cd "$(dirname "$0")" && pwd)"
 
 echo "🔄 Bumping version to $NEW_VERSION..."
 

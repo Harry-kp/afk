@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.1.1] - 2026-09-19
+
+### Fixes
+- Break counting in stats — taken and skipped breaks are now both counted in totals
+- Global keyboard shortcuts now match correctly on macOS and work as toggles (start/stop, pause/resume)
+
+### Improvements
+- Redesigned stats dashboard for faster comprehension
+- Keyboard shortcuts are now listed in Settings
+- Linux builds (AppImage, .deb, .rpm) ship with every release
+
+### Internal
+- Removed ~1,500 lines of dead code and 8 unused dependencies; smaller app bundle
+
 ## [1.1.0] - 2026-01-26
 
 ### Features
