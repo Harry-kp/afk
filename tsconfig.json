@@ -29,7 +29,7 @@
       "@lib/*": ["./src/renderer/lib/*"]
     }
   },
-  "include": ["src/renderer", "src/constants.js"],
-  "exclude": ["src/main", "src/__tests__", "node_modules", "**/*.test.*"],
+  "include": ["src/renderer"],
+  "exclude": ["node_modules"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

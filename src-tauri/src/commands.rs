@@ -31,11 +31,7 @@ pub async fn get_session_state(state: State<'_, AppState>) -> Result<SessionStat
     let remaining_secs = if let Some(ref end_time) = session.end_time {
         if is_paused {
             // Use stored remaining time when paused
-            session.remaining_time
-                .as_ref()
-                .and_then(|r| r.parse::<i64>().ok())
-                .map(|ms| ms / 1000)
-                .unwrap_or(0)
+            session.remaining_time.map(|ms| ms / 1000).unwrap_or(0)
         } else {
             calculate_remaining_secs(end_time)
         }
@@ -186,15 +182,9 @@ pub async fn start_session_internal<R: Runtime>(
     
     if is_resume {
         // Resume from stored remaining time
-        if let Some(remaining) = &session.remaining_time {
-            if let Ok(remaining_ms) = remaining.parse::<i64>() {
-                final_duration_ms = remaining_ms;
-            } else {
-                final_duration_ms = (state.get_setting_u64("session_duration") * 1000) as i64;
-            }
-        } else {
-            final_duration_ms = (state.get_setting_u64("session_duration") * 1000) as i64;
-        }
+        final_duration_ms = session
+            .remaining_time
+            .unwrap_or_else(|| (state.get_setting_u64("session_duration") * 1000) as i64);
     } else if let Some(custom_secs) = custom_duration_secs {
         // Custom duration (for snooze, etc.)
         final_duration_ms = (custom_secs * 1000) as i64;
@@ -298,18 +288,13 @@ async fn run_session_timer_loop<R: Runtime>(
             if remaining_secs <= 0 {
                 // Time for a break! 
                 play_chime_for_event(&app_handle, ChimeEvent::BreakStart);
-                trigger_break(&app_handle).await;
+                create_break_windows(&app_handle).await;
                 break;
             }
         } else {
             break;
         }
     }
-}
-
-/// Trigger a break (called when session timer ends)
-async fn trigger_break<R: Runtime>(app: &AppHandle<R>) {
-    create_break_windows(app).await;
 }
 
 /// Pause the current session
@@ -325,7 +310,7 @@ pub async fn pause_session<R: Runtime>(app: AppHandle<R>) -> Result<(), String> 
     if let Some(end_time) = &session.end_time {
         let remaining_ms = calculate_remaining_secs(end_time) * 1000;
         state.update_session(|s| {
-            s.remaining_time = Some(remaining_ms.to_string());
+            s.remaining_time = Some(remaining_ms);
             s.paused = true;
             s.paused_at = Some(now_iso());
         });
@@ -458,13 +443,6 @@ fn close_break_windows_internal<R: Runtime>(app: &AppHandle<R>) {
     state.set_break_closing(false);
 }
 
-/// Close all break windows (command)
-#[tauri::command]
-pub async fn close_break_windows<R: Runtime>(app: AppHandle<R>) -> Result<(), String> {
-    close_break_windows_internal(&app);
-    Ok(())
-}
-
 /// Create break windows on all displays and start the break timer
 pub async fn create_break_windows<R: Runtime>(app: &AppHandle<R>) {
     let state = app.state::<AppState>();
@@ -579,7 +557,7 @@ fn start_break_timer<R: Runtime>(app: &AppHandle<R>, break_duration: u64) {
                 // Trigger end break from backend
                 let state = app_handle.state::<AppState>();
                 if state.is_on_break() {
-                    end_break_internal(&app_handle).await;
+                    let _ = end_break(app_handle.clone()).await;
                 }
                 break;
             }
@@ -587,60 +565,6 @@ fn start_break_timer<R: Runtime>(app: &AppHandle<R>, break_duration: u64) {
     });
     
     *state.break_timer_handle.lock() = Some(handle);
-}
-
-/// Internal function to end break and start new session
-async fn end_break_internal<R: Runtime>(app: &AppHandle<R>) {
-    let state = app.state::<AppState>();
-    
-    // Track stats - break completed (flushes focus time internally)
-    let stats = app.state::<StatsManager>();
-    stats.break_completed();
-    
-    // Set closing flag to prevent recursive handling
-    state.set_break_closing(true);
-    
-    // Cancel break timer and close windows
-    state.cancel_break_timer();
-    state.set_on_break(false);
-    
-    // Close all break windows
-    for (label, window) in app.webview_windows() {
-        if label.starts_with("break") {
-            let _ = window.close();
-        }
-    }
-    
-    // Clear closing flag
-    state.set_break_closing(false);
-    
-    // Play chime and start new session
-    play_chime_for_event(app, ChimeEvent::BreakEnd);
-    
-    // Start new session
-    let session_duration = state.get_setting_u64("session_duration");
-    
-    // Reset timer flags
-    state.cancel_timer();
-    state.reset_timer_cancelled();
-    
-    // Set session end time
-    let end_time = Utc::now() + Duration::milliseconds((session_duration * 1000) as i64);
-    let end_time_str = end_time.to_rfc3339();
-    
-    state.update_session(|s| {
-        s.end_time = Some(end_time_str.clone());
-        s.paused = false;
-        s.remaining_time = None;
-        s.paused_at = None;
-        s.start_time = Some(now_iso());
-    });
-    
-    // Update tray
-    tray::update_tray_menu(app, true, false, false);
-    
-    // Start session timer
-    start_session_timer(app);
 }
 
 /// Show the main window and navigate to dashboard or settings
@@ -684,12 +608,6 @@ pub async fn get_config_path(state: State<'_, AppState>) -> Result<String, Strin
 #[tauri::command]
 pub async fn get_stats(stats: State<'_, StatsManager>) -> Result<StatsResponse, String> {
     Ok(stats.get_stats())
-}
-
-/// Get today's focus time in seconds (for live display in menu bar)
-#[tauri::command]
-pub async fn get_today_focus(stats: State<'_, StatsManager>) -> Result<u64, String> {
-    Ok(stats.get_today_focus_secs())
 }
 
 /// Clear all statistics

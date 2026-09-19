@@ -13,47 +13,37 @@ pub struct Session {
     pub end_time: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub start_time: Option<String>,
+    /// Milliseconds left when the session was paused
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub remaining_time: Option<String>,
+    pub remaining_time: Option<i64>,
     #[serde(default)]
     pub paused: bool,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub paused_at: Option<String>,
 }
 
-/// Default configuration values matching the original constants.js
-pub mod defaults {
-    pub const DEFAULT_INTERVAL_DURATION: u64 = 1500; // 25 minutes in seconds
-    pub const DEFAULT_BREAK_DURATION: u64 = 30; // 30 seconds
-    pub const BREAK_NOTIFICATION_AT: u64 = 60; // 1 minute before break
-    pub const DEFAULT_LONG_BREAK_DURATION: u64 = 120; // 2 minutes
-    pub const DEFAULT_LONG_BREAK_AFTER: u64 = 2; // After 2 short breaks
-}
-
 /// Get default settings as a HashMap
 pub fn get_default_settings() -> HashMap<String, serde_json::Value> {
     let mut settings = HashMap::new();
-    
+
     settings.insert("launch_at_login".to_string(), serde_json::json!(true));
     settings.insert("start_timer".to_string(), serde_json::json!(false));
-    settings.insert("session_duration".to_string(), serde_json::json!(defaults::DEFAULT_INTERVAL_DURATION));
-    settings.insert("break_duration".to_string(), serde_json::json!(defaults::DEFAULT_BREAK_DURATION));
+    settings.insert("session_duration".to_string(), serde_json::json!(1500)); // 25 minutes
+    settings.insert("break_duration".to_string(), serde_json::json!(30)); // 30 seconds
     settings.insert("pre_break_reminder_enabled".to_string(), serde_json::json!(true));
-    settings.insert("pre_break_reminder_at".to_string(), serde_json::json!(defaults::BREAK_NOTIFICATION_AT));
-    settings.insert("reset_timer_enabled".to_string(), serde_json::json!(true));
+    settings.insert("pre_break_reminder_at".to_string(), serde_json::json!(60)); // 1 min before break
     settings.insert("toolbar_timer_style".to_string(), serde_json::json!("remaining"));
     settings.insert("long_break_enabled".to_string(), serde_json::json!(true));
-    settings.insert("long_break_duration".to_string(), serde_json::json!(defaults::DEFAULT_LONG_BREAK_DURATION));
-    settings.insert("long_break_after".to_string(), serde_json::json!(defaults::DEFAULT_LONG_BREAK_AFTER));
-    settings.insert("short_break_count".to_string(), serde_json::json!(0u64));
-    
+    settings.insert("long_break_duration".to_string(), serde_json::json!(120)); // 2 minutes
+    settings.insert("long_break_after".to_string(), serde_json::json!(2)); // after 2 short breaks
+
     // Chime settings (OFF by default - non-intrusive)
     settings.insert("chime_enabled".to_string(), serde_json::json!(false));
     settings.insert("chime_on_session_start".to_string(), serde_json::json!(true));
     settings.insert("chime_on_break_start".to_string(), serde_json::json!(true));
     settings.insert("chime_on_break_end".to_string(), serde_json::json!(true));
     settings.insert("chime_on_reminder".to_string(), serde_json::json!(false));
-    
+
     settings
 }
 

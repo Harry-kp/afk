@@ -6,7 +6,6 @@ import {
   BellRing,
   LogIn,
   ArrowLeft,
-  TimerReset,
   Volume2,
   Globe,
   Share2,
@@ -33,7 +32,6 @@ import { Button } from './components/ui/button';
 import { Label } from './components/ui/label';
 import { StartupSettings } from './startupSettings';
 import { FocusSettings } from './focusSettings';
-import { IdleTimeSettings } from './idleTimeSettings';
 import { ShortBreakSettings } from './shortBreakSettings';
 import { PreBreakSettings } from './preBreakSettings';
 import { LongBreakSettings } from './longBreakSettings';
@@ -331,13 +329,6 @@ function Settings({
               <div className="flex items-center justify-center gap-x-8 [&>div]:w-full">
                 <BellRing className="self-center" width={20} height={20} />
                 <PreBreakSettings />
-              </div>
-              <div className="pt-4" />
-              <Separator className="my-4" />
-              <div className="pt-4" />
-              <div className="flex items-center justify-center gap-x-8 [&>div]:w-full">
-                <TimerReset className="self-center" width={20} height={20} />
-                <IdleTimeSettings />
               </div>
             </TabsContent>
             <TabsContent value="system">

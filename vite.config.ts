@@ -32,13 +32,6 @@ export default defineConfig({
     },
   },
   
-  // CSS configuration
-  css: {
-    modules: {
-      localsConvention: 'camelCaseOnly',
-    },
-  },
-  
   // Environment variables
   envPrefix: ['VITE_', 'TAURI_'],
   

@@ -7,25 +7,10 @@ import { AuroraBackground } from './components/ui/aurora-background';
 import { COPIES, LONG_BREAK_COPIES } from './constants';
 
 function getTime(durationInSeconds: number) {
-  const hours = Math.floor(durationInSeconds / 3600);
-  const minutes = Math.floor((durationInSeconds % 3600) / 60);
-  const seconds = durationInSeconds % 60;
-
-  const result = { hrs: 0, mins: 0, secs: 0 };
-
-  if (hours > 0) {
-    result.hrs = hours;
-  }
-
-  if (minutes > 0) {
-    result.mins = minutes;
-  }
-
-  if (seconds > 0) {
-    result.secs = seconds;
-  }
-
-  return result;
+  return {
+    mins: Math.floor((durationInSeconds % 3600) / 60),
+    secs: durationInSeconds % 60,
+  };
 }
 
 // Start fading out when this many seconds are left
@@ -145,21 +130,17 @@ function Break({ isLongBreak, initialDuration }: { isLongBreak: boolean; initial
         }}
         className="relative flex flex-col gap-4 items-center justify-center px-4"
       >
-        <div className="grid grid-flow-col gap-5 text-center auto-cols-max">
+        <div className="grid grid-flow-col gap-5 text-center auto-cols-max text-white">
           {mins > 0 && (
-            <div className="flex flex-col p-2 rounded-box text-neutral-content">
-              <span className="countdown font-mono text-5xl">
-                <span style={{ '--value': mins } as React.CSSProperties} />
-              </span>
+            <div className="flex flex-col p-2">
+              <span className="font-mono text-5xl">{String(mins).padStart(2, '0')}</span>
               mins
             </div>
           )}
-            <div className="flex flex-col p-2 rounded-box text-neutral-content">
-              <span className="countdown font-mono text-5xl">
-              <span style={{ '--value': secs } as React.CSSProperties} />
-              </span>
-              secs
-            </div>
+          <div className="flex flex-col p-2">
+            <span className="font-mono text-5xl">{String(secs).padStart(2, '0')}</span>
+            secs
+          </div>
         </div>
         <div className="text-3xl md:text-7xl font-bold text-white text-center">
           {copy.title}
