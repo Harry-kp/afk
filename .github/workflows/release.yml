@@ -51,15 +51,20 @@ jobs:
 
             ### Homebrew (Recommended)
             ```bash
-            brew tap Harry-kp/tap
-            brew install --cask afk
+            brew install --cask Harry-kp/tap/afk
             ```
 
             ### Direct Download
-            Download the DMG (macOS) or AppImage/deb (Linux) below.
+            Download the DMG (macOS) or AppImage/.deb/.rpm (Linux) below.
 
-            **macOS first launch:** Right-click the app → Open → Open
-            (Required for apps outside the App Store)
+            ### macOS first launch — applies to both methods
+            AFK is not notarized yet, so macOS refuses to open it the first time
+            ("Afk is damaged and can't be opened"). Clear the quarantine flag:
+            ```bash
+            xattr -rd com.apple.quarantine /Applications/Afk.app
+            ```
+            Or open **System Settings → Privacy & Security**, scroll to Security,
+            and click **Open Anyway** next to AFK, then confirm.
           releaseDraft: true
           prerelease: false
           args: --target universal-apple-darwin

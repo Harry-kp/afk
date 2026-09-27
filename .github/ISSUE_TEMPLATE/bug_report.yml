@@ -1,0 +1,35 @@
+name: Bug report
+description: Something AFK does wrong on your machine
+title: "[Bug] "
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        AFK is maintained as needed rather than full time, so replies may be slow.
+        Questions and ideas belong in [Discussions](https://github.com/Harry-kp/afk/discussions).
+
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened, and what did you expect?
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Start a session
+        2. ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: setup
+    attributes:
+      label: Version, OS, and how you installed it
+      placeholder: "1.1.1 · macOS 15.6 Apple Silicon · Homebrew cask"
+    validations:
+      required: true
