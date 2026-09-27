@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Questions & ideas
+    url: https://github.com/Harry-kp/afk/discussions
+    about: Ask here instead of opening an issue
+  - name: "macOS says AFK is damaged and can't be opened"
+    url: https://github.com/Harry-kp/afk#install
+    about: Expected — AFK isn't notarized yet. The one-command fix is in the README.
+  - name: Security vulnerability
+    url: https://github.com/Harry-kp/afk/security/policy
+    about: Please report privately, not in a public issue

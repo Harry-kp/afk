@@ -169,7 +169,13 @@ npm run build
 
 ## Contributing
 
-Contributions welcome. See [CONTRIBUTING.md](CONTRIBUTING.md).
+Contributions welcome — for anything bigger than a small fix, open an issue first.
+See [CONTRIBUTING.md](CONTRIBUTING.md).
+
+## Security & privacy
+
+Settings and stats stay on your machine — what is stored, where, and how to report a
+vulnerability: [SECURITY.md](SECURITY.md).
 
 ## License
 
