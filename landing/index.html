@@ -102,7 +102,7 @@
           </div>
           
           <div class="install-box">
-            <code>brew install --cask afk</code>
+            <code>brew install --cask Harry-kp/tap/afk</code>
             <button class="copy-btn" onclick="copyCommand()">Copy</button>
           </div>
         </div>
@@ -230,7 +230,7 @@
           <div class="step-card" data-animate data-animate-delay="2">
             <div class="step-number">2</div>
             <h3>Launch</h3>
-            <p>Not yet notarized: open System Settings &rarr; Privacy &amp; Security &rarr; <strong>Open Anyway</strong>. Then click the &#128064; icon in your menu bar.</p>
+            <p>Not yet notarized, so macOS blocks the first launch &mdash; Homebrew installs too. Run <code>xattr -rd com.apple.quarantine /Applications/Afk.app</code>, or open System Settings &rarr; Privacy &amp; Security &rarr; <strong>Open Anyway</strong>. Then click the &#128064; icon in your menu bar.</p>
           </div>
           
           <div class="step-card" data-animate data-animate-delay="3">
@@ -315,7 +315,7 @@
               </a>
               
               <div class="install-box">
-                <code>brew tap Harry-kp/tap && brew install --cask afk</code>
+                <code>brew install --cask Harry-kp/tap/afk</code>
                 <button class="copy-btn" onclick="copyCommand()">Copy</button>
               </div>
             </div>
@@ -349,7 +349,7 @@
 
   <script>
     const RELEASES_URL = 'https://github.com/Harry-kp/afk/releases/latest';
-    const HOMEBREW_CMD = 'brew tap Harry-kp/tap && brew install --cask afk';
+    const HOMEBREW_CMD = 'brew install --cask Harry-kp/tap/afk';
 
     // Navbar scroll effect
     const navbar = document.getElementById('navbar');

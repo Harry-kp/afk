@@ -64,9 +64,7 @@ jobs:
         run: |
           echo "🍺 Testing Homebrew installation..."
           
-          # Tap and install
-          brew tap Harry-kp/tap
-          brew install --cask afk
+          brew install --cask Harry-kp/tap/afk
           
           # Verify app exists
           if [ ! -d "/Applications/Afk.app" ]; then
@@ -121,7 +119,7 @@ jobs:
         run: |
           pkill -f "Afk.app" 2>/dev/null || true
           pkill -x "afk" 2>/dev/null || true
-          brew uninstall --cask afk 2>/dev/null || true
+          brew uninstall --cask Harry-kp/tap/afk 2>/dev/null || true
           brew untap Harry-kp/tap 2>/dev/null || true
 
   test-landing-page:

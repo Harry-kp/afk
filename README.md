@@ -64,7 +64,7 @@ Most break reminders are either too aggressive (popup every 5 minutes) or too ea
 <sub>Sizes are the published release artifacts. The Linux AppImage is 77 MB because AppImage bundles its own runtime — the `.deb`/`.rpm` are the like-for-like comparison.</sub>
 
 > **Project status** — AFK works and is maintained as needed, but it is not under
-> active development. The latest release is v1.1.0 (February 2026). Issues and pull
+> active development. The latest release is v1.1.1 (September 2026). Issues and pull
 > requests are welcome; replies may be slow.
 
 ## Install
@@ -72,19 +72,26 @@ Most break reminders are either too aggressive (popup every 5 minutes) or too ea
 **macOS — Homebrew (recommended)**
 
 ```bash
-brew tap Harry-kp/tap
-brew install --cask afk
+brew install --cask Harry-kp/tap/afk
 ```
 
 **macOS — Direct Download**
 
 Download the latest `.dmg` from [releases](https://github.com/Harry-kp/afk/releases/latest).
 
-> **First launch on macOS.** The app is not yet notarized, so macOS shows
-> *"Afk is damaged and can't be opened."* The Control-click bypass was removed
-> in macOS Sequoia, so open **System Settings → Privacy & Security**, scroll to
-> Security, and click **Open Anyway** next to AFK, then confirm. Notarized
-> builds are planned, which will remove this step entirely.
+> **First launch on macOS — with either method.** AFK is not notarized yet, so
+> macOS refuses to open it the first time: *"Afk is damaged and can't be opened."*
+> Homebrew no longer strips the quarantine flag, so the cask hits this too.
+> Clear the flag:
+>
+> ```bash
+> xattr -rd com.apple.quarantine /Applications/Afk.app
+> ```
+>
+> Or open **System Settings → Privacy & Security**, scroll to Security, and click
+> **Open Anyway** next to AFK, then confirm — the Control-click bypass was removed
+> in macOS Sequoia. Notarized builds are planned, which will remove this step
+> entirely.
 
 **Linux — AppImage**
 
