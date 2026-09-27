@@ -28,5 +28,10 @@ jobs:
           vercel pull --yes --environment=production --token=$VERCEL_TOKEN
           vercel build --prod --token=$VERCEL_TOKEN
           vercel deploy --prebuilt --prod --token=$VERCEL_TOKEN
-          echo "✅ Landing page deployed to production"
+
+      - name: Verify the site actually serves
+        run: |
+          code=$(curl -s -o /dev/null -w "%{http_code}" --retry 3 --retry-delay 5 https://afk-app.vercel.app)
+          [ "$code" = "200" ] || { echo "❌ afk-app.vercel.app returned HTTP $code"; exit 1; }
+          echo "✅ afk-app.vercel.app returns 200"
 
